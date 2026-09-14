@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scroll-Driven Video — Apple Technique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,6 +19,16 @@
         <!-- Video is loaded via JS as a blob for guaranteed full buffering -->
         <div class="video-container">
           <video id="scrub-video" muted playsinline></video>
+        </div>
+
+        <!-- Text overlays for the Global Reserve screen, timed to video progress -->
+        <div class="text-overlay">
+          <div class="text-block text-block-1" id="text-block-1">
+            <p>Global Reserve® — Your Asset Control Center</p>
+          </div>
+          <div class="text-block text-block-2" id="text-block-2">
+            <p>Think of it as the smart hub behind your Glonari participation — one place that tracks your housing payments, rewards, and reserves, so you don't have to juggle them yourself.</p>
+          </div>
         </div>
 
       </div>
