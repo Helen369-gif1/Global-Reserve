@@ -14,7 +14,7 @@
   const CROSSFADE = 0.5;
   const WORD_IN_Y = 40;   // px, fade-in starts this far below rest position
   const WORD_OUT_Y = -30; // px, fade-out ends this far above rest position
-  const WORD_DURATION_RATIO = 0.8; // fraction of CROSSFADE each word's own tween takes — higher means more overlap between neighboring words, i.e. a softer wave instead of a snappier per-word cut
+  const WORD_DURATION_RATIO = 0.9; // fraction of CROSSFADE each word's own tween takes — higher means more overlap between neighboring words, i.e. a softer wave instead of a snappier per-word cut
 
   const pageLoadTime = performance.now() / 1000;
 
