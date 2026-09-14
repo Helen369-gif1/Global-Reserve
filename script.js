@@ -14,7 +14,7 @@
   const CROSSFADE = 0.5;
   const WORD_IN_Y = 40;   // px, fade-in starts this far below rest position
   const WORD_OUT_Y = -30; // px, fade-out ends this far above rest position
-  const WORD_DURATION_RATIO = 0.6; // fraction of CROSSFADE each word's own tween takes
+  const WORD_DURATION_RATIO = 0.8; // fraction of CROSSFADE each word's own tween takes — higher means more overlap between neighboring words, i.e. a softer wave instead of a snappier per-word cut
 
   const pageLoadTime = performance.now() / 1000;
 
@@ -158,6 +158,23 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   update();
 
+  // ── Time smoothing ──
+  // A fast scroll/flick can jump `target` across the whole 0.5s CROSSFADE
+  // window in a single frame, which would make the text (and, to a lesser
+  // extent, the video) snap instead of animate. `smoothedTime` chases
+  // `target` with frame-rate-independent exponential smoothing (the same
+  // idea as GSAP ScrollTrigger's numeric `scrub` value) so both the video
+  // seek and the text timing always move through the intervening time
+  // instead of teleporting to it.
+  //
+  // factor = 1 - SMOOTHING_BASE^dt: at SMOOTHING_BASE = 0.001, ~90% of any
+  // gap closes within ~0.3s and ~97% within 0.5s (the CROSSFADE length) —
+  // fast enough that calm scrolling still feels immediate, slow enough
+  // that a quick flick's crossfade actually plays instead of skipping.
+  const SMOOTHING_BASE = 0.001;
+  let smoothedTime = 0;
+  let lastFrameTimestamp = null;
+
   // ── Video scrub loop ──
   // Runs independently of the scroll handler, on every animation frame.
   // Only issues a new seek once the previous one has finished (!video.seeking) —
@@ -165,15 +182,22 @@
   // and causes visible jitter, so this always seeks toward the latest
   // scroll progress rather than replaying every intermediate value.
 
-  function videoLoop() {
+  function videoLoop(timestamp) {
+    const deltaTime = lastFrameTimestamp === null ? 0 : (timestamp - lastFrameTimestamp) / 1000;
+    lastFrameTimestamp = timestamp;
+
     // Text timing runs even before the video's metadata has loaded (target
     // is simply 0 until then), so the first block can start appearing
     // immediately on page load rather than waiting on the blob fetch.
     const target = videoReady ? latestProgress * videoDuration : 0;
-    if (videoReady && !video.seeking && Math.abs(video.currentTime - target) > 1 / 24) {
-      video.currentTime = target;
+
+    const smoothingFactor = 1 - Math.pow(SMOOTHING_BASE, deltaTime);
+    smoothedTime += (target - smoothedTime) * smoothingFactor;
+
+    if (videoReady && !video.seeking && Math.abs(video.currentTime - smoothedTime) > 1 / 24) {
+      video.currentTime = smoothedTime;
     }
-    updateTextBlocks(target);
+    updateTextBlocks(smoothedTime);
     requestAnimationFrame(videoLoop);
   }
   requestAnimationFrame(videoLoop);
