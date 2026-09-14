@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #fff;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+               'SF Pro Text', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Performance section ──
+   NO overflow set here. overflow-x:clip + overflow-y:visible
+   gets coerced to overflow-y:auto by spec, which breaks
+   position:sticky on descendants. Apple avoids this by using
+   overflow-y:unset in their enhanced mode. We just skip it. */
+
+.section-performance {
+  position: relative;
+}
+
+/* 700vh = the scroll runway. You scroll through this tall box
+   while the sticky child stays pinned on screen. */
+.chapters-wrapper {
+  height: 300vh;
+}
+
+/* Sticky viewport — stays pinned at top:0 while you scroll
+   through the 700vh parent. All chapters stack in one grid cell. */
+.chapters {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  align-items: center;
+}
+
+/* ── Video ── */
+
+.video-container {
+  grid-row: 1;
+  grid-column: 1;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+}
+
+.video-container video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
