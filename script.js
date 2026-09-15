@@ -7,14 +7,16 @@
   let latestProgress = 0;
 
   // ── Text block timecoding (global_reserve_timecoding.md) ──
-  // Each block's words fade/slide in over CROSSFADE seconds (staggered,
-  // bottom-to-top), optionally hold, then — except the last block —
-  // fade/slide out over CROSSFADE seconds before the next block's
-  // window begins.
-  const CROSSFADE = 0.5;
-  const WORD_IN_Y = 40;   // px, fade-in starts this far below rest position
-  const WORD_OUT_Y = -30; // px, fade-out ends this far above rest position
-  const WORD_DURATION_RATIO = 0.9; // fraction of CROSSFADE each word's own tween takes — higher means more overlap between neighboring words, i.e. a softer wave instead of a snappier per-word cut
+  // A single GSAP timeline (paused, driven manually by .time()) holds every
+  // word tween in one shared clock, so block 1's fade-out and block 2's
+  // fade-in genuinely overlap — a real crossfade dissolve instead of two
+  // back-to-back fades that touch at a point and read as a hard cut.
+  const FADE_DURATION = 0.7;   // seconds, each word's own tween
+  const WORD_STAGGER = 0.03;   // seconds between neighboring words starting
+  const WORD_IN_Y = 36;        // px, fade-in starts this far below rest position
+  const WORD_OUT_Y = -26;      // px, fade-out ends this far above rest position
+  const HOLD1_END = 1.5;       // block 1 stays fully visible until this video-time
+  const CROSSFADE_START = HOLD1_END; // block 1 fade-out / block 2 fade-in both begin here
 
   const pageLoadTime = performance.now() / 1000;
 
@@ -28,86 +30,55 @@
   }
 
   const textBlocks = [
-    { el: document.getElementById('text-block-1'), start: 0.0, end: 2.0 },
-    { el: document.getElementById('text-block-2'), start: 2.0, end: 5.0 },
+    { el: document.getElementById('text-block-1') },
+    { el: document.getElementById('text-block-2') },
   ]
     .filter(b => b.el)
     .map(b => ({ ...b, words: splitTextIntoWords(b.el.querySelector('p')) }));
+
+  const [block1, block2] = textBlocks;
+
+  const textTimeline = gsap.timeline({ paused: true });
+
+  if (block1 && block1.words.length) {
+    textTimeline.fromTo(
+      block1.words,
+      { opacity: 0, y: WORD_IN_Y },
+      { opacity: 1, y: 0, duration: FADE_DURATION, ease: 'power3.out', stagger: WORD_STAGGER },
+      0
+    );
+    textTimeline.to(
+      block1.words,
+      { opacity: 0, y: WORD_OUT_Y, duration: FADE_DURATION, ease: 'power2.in', stagger: WORD_STAGGER },
+      CROSSFADE_START
+    );
+  }
+
+  if (block2 && block2.words.length) {
+    textTimeline.fromTo(
+      block2.words,
+      { opacity: 0, y: WORD_IN_Y },
+      { opacity: 1, y: 0, duration: FADE_DURATION, ease: 'power3.out', stagger: WORD_STAGGER },
+      CROSSFADE_START
+    );
+  }
+
+  // Render the t=0 (everything hidden) state immediately so words don't
+  // flash unstyled before the first animation frame runs.
+  textTimeline.time(0);
 
   function clamp(v, min, max) {
     return Math.min(Math.max(v, min), max);
   }
 
-  // power3.out-style ease: fast start, gentle settle.
-  function easeOutCubic(x) {
-    return 1 - Math.pow(1 - x, 3);
-  }
-
-  // power2.in-style ease: gentle start, fast finish.
-  function easeInQuad(x) {
-    return x * x;
-  }
-
-  // Words are staggered evenly across the window, each animating over
-  // its own slice, so the first word starts exactly at the window's
-  // start and the last word finishes exactly at the window's end.
-  function wordTiming(count) {
-    const wordDuration = CROSSFADE * WORD_DURATION_RATIO;
-    const spread = CROSSFADE - wordDuration;
-    const perWordDelay = count > 1 ? spread / (count - 1) : 0;
-    return { wordDuration, perWordDelay };
-  }
-
-  function applyBlock(block, t, isLast) {
-    const { words, start, end } = block;
-    if (!words.length) return;
-
-    const fadeInStart = start;
-    const fadeInEnd = start + CROSSFADE;
-    const fadeOutStart = isLast ? Infinity : end - CROSSFADE;
-    const fadeOutEnd = end;
-    const inTiming = wordTiming(words.length);
-    const outTiming = wordTiming(words.length);
-
-    words.forEach((word, i) => {
-      let opacity;
-      let y;
-
-      if (t <= fadeInStart) {
-        opacity = 0;
-        y = WORD_IN_Y;
-      } else if (t < fadeInEnd) {
-        const localStart = fadeInStart + i * inTiming.perWordDelay;
-        const eased = easeOutCubic(clamp((t - localStart) / inTiming.wordDuration, 0, 1));
-        opacity = eased;
-        y = WORD_IN_Y * (1 - eased);
-      } else if (!isLast && t > fadeOutStart) {
-        const localStart = fadeOutStart + i * outTiming.perWordDelay;
-        const eased = easeInQuad(clamp((t - localStart) / outTiming.wordDuration, 0, 1));
-        opacity = 1 - eased;
-        y = WORD_OUT_Y * eased;
-      } else {
-        opacity = 1;
-        y = 0;
-      }
-
-      word.style.opacity = opacity;
-      word.style.transform = `translateY(${y}px)`;
-    });
-  }
-
   function updateTextBlocks(currentTime) {
-    // The very first block must start appearing as soon as the page loads,
-    // even before the user scrolls — so its effective time is whichever is
+    // Block 1 must start appearing as soon as the page loads, even before
+    // the user scrolls — so the timeline's effective time is whichever is
     // further along: real time elapsed since load, or scroll-driven time.
-    const elapsedSinceLoad = clamp(performance.now() / 1000 - pageLoadTime, 0, CROSSFADE);
-
-    textBlocks.forEach((block, i) => {
-      const isFirst = i === 0;
-      const isLast = i === textBlocks.length - 1;
-      const t = isFirst ? Math.max(currentTime, elapsedSinceLoad) : currentTime;
-      applyBlock(block, t, isLast);
-    });
+    // The cap matches the fade-in duration, well short of the crossfade
+    // region, so this early nudge never affects block 2's timing.
+    const elapsedSinceLoad = clamp(performance.now() / 1000 - pageLoadTime, 0, FADE_DURATION);
+    textTimeline.time(Math.max(currentTime, elapsedSinceLoad));
   }
 
   // ── Load video as blob ──
@@ -115,7 +86,7 @@
   // before scrubbing starts. preload="auto" is just a hint that browsers
   // often ignore for large files.
 
-  fetch('video5.mp4')
+  fetch('video111.mp4')
     .then(r => r.blob())
     .then(blob => {
       video.src = URL.createObjectURL(blob);
@@ -159,7 +130,7 @@
   update();
 
   // ── Time smoothing ──
-  // A fast scroll/flick can jump `target` across the whole 0.5s CROSSFADE
+  // A fast scroll/flick can jump `target` across the whole FADE_DURATION
   // window in a single frame, which would make the text (and, to a lesser
   // extent, the video) snap instead of animate. `smoothedTime` chases
   // `target` with frame-rate-independent exponential smoothing (the same
@@ -168,9 +139,9 @@
   // instead of teleporting to it.
   //
   // factor = 1 - SMOOTHING_BASE^dt: at SMOOTHING_BASE = 0.001, ~90% of any
-  // gap closes within ~0.3s and ~97% within 0.5s (the CROSSFADE length) —
-  // fast enough that calm scrolling still feels immediate, slow enough
-  // that a quick flick's crossfade actually plays instead of skipping.
+  // gap closes within ~0.3s and ~97% within 0.5s — fast enough that calm
+  // scrolling still feels immediate, slow enough that a quick flick's
+  // crossfade actually plays instead of skipping.
   const SMOOTHING_BASE = 0.001;
   let smoothedTime = 0;
   let lastFrameTimestamp = null;
