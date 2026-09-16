@@ -167,10 +167,10 @@ Two columns, 50/50. Text left, media right. Media slot: `--media-question` (see 
 | Element | Copy | Style | Align |
 |---|---|---|---|
 | H2 | `Everyone asks how much they have.`<br>`Almost nobody can answer how long they're covered.` | `--fs-h2`, two lines, `<br>` between them | left |
-| Body | `A balance tells you about today. It doesn't tell you whether your home is safe next year, or the year after that. Global Reserve answers the second question — it reads everything you hold, everything you owe on housing, and turns it into time.` | `--fs-body`, max-width 560px | left |
+| Body | `A balance tells you about today. It doesn't tell you how many years your housing is financially covered. Global Reserve answers the second question — it reads everything you hold, everything you owe on housing, and turns it into time.` | `--fs-body`, max-width 560px | left |
 | Stat label | `Years of housing covered` | `--fs-caption`, `--gr-ink-2` | left |
-| Stat value | `for example, eight and a half` | `--fs-stat`, color `--gr-ink-2` | left |
-| Caption | `Your own number depends on your position and your obligations.` | `--fs-caption`, `--gr-ink-2` | left |
+| Stat value | `8.5 years` | `--fs-stat`, color `--gr-ink-2` | left |
+| Caption | `Your own number depends on what you hold and what you owe.` | `--fs-caption`, `--gr-ink-2` | left |
 
 The stat block sits below the body with a 1px top hairline in `--gr-line`.
 

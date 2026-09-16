@@ -111,7 +111,8 @@
   overflow: hidden;
 }
 
-.media-slot canvas {
+.media-slot canvas,
+.media-slot svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -233,5 +234,172 @@
   .screen-question__container {
     grid-template-columns: 1fr;
     gap: 56px;
+  }
+}
+
+/* ── Screen 3 — What RED actually is ──
+   Dark composition: centered header, one wide split card
+   (media 40% / text 60%), three supporting lines below. */
+
+#screen-3 {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+  padding-block: clamp(96px, 11vw, 160px);
+}
+
+#screen-3 .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.screen-red__header {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.screen-red__eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gr-bronze);
+}
+
+.screen-red__heading {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+  margin-top: 16px;
+}
+
+.screen-red__card {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 64px;
+  align-items: center;
+  margin-top: 80px;
+  padding: 32px;
+  border: 1px solid var(--gr-glass-line);
+  border-radius: 8px;
+  background: var(--gr-surface);
+}
+
+.screen-red__media {
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  width: min(100%, 480px);
+  margin-inline: auto;
+}
+
+.screen-red__body {
+  min-width: 0;
+  max-width: 560px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+  text-align: left;
+}
+
+.screen-red__lines {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px;
+  margin-top: 64px;
+}
+
+.screen-red__line {
+  min-width: 0;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+  text-align: left;
+}
+
+/* ── Red-object illustration (decorative, no external asset) ──
+   A still isometric composition of stacked geometric slabs and
+   support posts standing on a wide platform: RED as the built
+   foundation under a home, not a currency. Every face is a plain
+   polygon in one of three bronze tones; the two lines are
+   understated assembly guides. Nothing here reads as a coin,
+   a card, a chart, or a literal house. */
+
+.screen-red__face {
+  stroke: var(--gr-glass-line);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.screen-red__face--top {
+  fill: var(--gr-bronze);
+  fill-opacity: 1;
+}
+
+.screen-red__face--right {
+  fill: var(--gr-bronze);
+  fill-opacity: 0.55;
+}
+
+.screen-red__face--left {
+  fill: var(--gr-bronze);
+  fill-opacity: 0.3;
+}
+
+.screen-red__guide {
+  stroke: var(--gr-glass-line);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.6;
+}
+
+@media (max-width: 1024px) {
+  .screen-red__card {
+    gap: 48px;
+  }
+
+  .screen-red__lines {
+    gap: 32px;
+  }
+}
+
+@media (max-width: 960px) {
+  .screen-red__card {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .screen-red__media {
+    order: -1;
+  }
+
+  .screen-red__lines {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  #screen-3 {
+    padding-block: clamp(72px, 9vw, 96px);
+  }
+
+  #screen-3 .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .screen-red__card {
+    padding: 24px;
   }
 }
