@@ -8,15 +8,19 @@
 
   // ── Text block timecoding (global_reserve_timecoding.md) ──
   // A single GSAP timeline (paused, driven manually by .time()) holds every
-  // word tween in one shared clock, so block 1's fade-out and block 2's
-  // fade-in genuinely overlap — a real crossfade dissolve instead of two
-  // back-to-back fades that touch at a point and read as a hard cut.
-  const FADE_DURATION = 0.7;   // seconds, each word's own tween
-  const WORD_STAGGER = 0.03;   // seconds between neighboring words starting
-  const WORD_IN_Y = 36;        // px, fade-in starts this far below rest position
-  const WORD_OUT_Y = -26;      // px, fade-out ends this far above rest position
-  const HOLD1_END = 1.5;       // block 1 stays fully visible until this video-time
-  const CROSSFADE_START = HOLD1_END; // block 1 fade-out / block 2 fade-in both begin here
+  // word tween in one shared clock. Each block has its own independent
+  // in/out start time (video-time seconds) — no crossfade: block 1 must be
+  // fully faded out before block 2 starts fading in, so there's always a
+  // brief gap with no text on screen between them.
+  const FADE_DURATION = 0.7;      // seconds, each word's own tween
+  const WORD_STAGGER = 0.03;      // seconds between neighboring words starting
+  const WORD_IN_Y = 36;           // px, fade-in starts this far below rest position
+  const WORD_OUT_Y = -26;         // px, fade-out ends this far above rest position
+
+  const BLOCK1_IN_START = 0.0;    // video-time (s) block 1 starts appearing
+  const BLOCK1_OUT_START = 1.1;   // video-time (s) block 1 starts disappearing
+  const BLOCK2_IN_START = 1.9;    // video-time (s) block 2 starts appearing
+  const BLOCK2_OUT_START = 4.2;   // video-time (s) block 2 starts disappearing
 
   const pageLoadTime = performance.now() / 1000;
 
@@ -45,12 +49,12 @@
       block1.words,
       { opacity: 0, y: WORD_IN_Y },
       { opacity: 1, y: 0, duration: FADE_DURATION, ease: 'power3.out', stagger: WORD_STAGGER },
-      0
+      BLOCK1_IN_START
     );
     textTimeline.to(
       block1.words,
       { opacity: 0, y: WORD_OUT_Y, duration: FADE_DURATION, ease: 'power2.in', stagger: WORD_STAGGER },
-      CROSSFADE_START
+      BLOCK1_OUT_START
     );
   }
 
@@ -59,7 +63,12 @@
       block2.words,
       { opacity: 0, y: WORD_IN_Y },
       { opacity: 1, y: 0, duration: FADE_DURATION, ease: 'power3.out', stagger: WORD_STAGGER },
-      CROSSFADE_START
+      BLOCK2_IN_START
+    );
+    textTimeline.to(
+      block2.words,
+      { opacity: 0, y: WORD_OUT_Y, duration: FADE_DURATION, ease: 'power2.in', stagger: WORD_STAGGER },
+      BLOCK2_OUT_START
     );
   }
 
@@ -75,9 +84,13 @@
     // Block 1 must start appearing as soon as the page loads, even before
     // the user scrolls — so the timeline's effective time is whichever is
     // further along: real time elapsed since load, or scroll-driven time.
-    // The cap matches the fade-in duration, well short of the crossfade
-    // region, so this early nudge never affects block 2's timing.
-    const elapsedSinceLoad = clamp(performance.now() / 1000 - pageLoadTime, 0, FADE_DURATION);
+    // The cap matches block 1's fade-in window, so this early nudge never
+    // affects block 1's fade-out or block 2's timing.
+    const elapsedSinceLoad = clamp(
+      performance.now() / 1000 - pageLoadTime,
+      BLOCK1_IN_START,
+      BLOCK1_IN_START + FADE_DURATION
+    );
     textTimeline.time(Math.max(currentTime, elapsedSinceLoad));
   }
 
