@@ -99,7 +99,7 @@
   // before scrubbing starts. preload="auto" is just a hint that browsers
   // often ignore for large files.
 
-  fetch('video111.mp4')
+  fetch('media/hero-vault.mp4')
     .then(r => r.blob())
     .then(blob => {
       video.src = URL.createObjectURL(blob);
@@ -112,7 +112,7 @@
   });
 
   // ── Scroll progress (0–1) ──
-  // Maps how far you've scrolled through the 700vh wrapper.
+  // Maps how far you've scrolled through the tall wrapper.
 
   function getProgress() {
     const rect = wrapper.getBoundingClientRect();

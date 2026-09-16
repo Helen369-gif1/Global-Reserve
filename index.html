@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scroll-Driven Video — Apple Technique</title>
+  <title>GLOBAL RESERVE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/screens.css">
 </head>
 <body>
 
-  <!-- The scroll-driven performance section -->
-  <section class="section-performance">
+  <!-- Screen 1 — Hero. Scroll-driven video with per-word text animation. -->
+  <section id="screen-1" data-screen="hero" class="section-performance">
     <div class="chapters-wrapper">
       <div class="chapters">
 
@@ -35,7 +37,69 @@
     </div>
   </section>
 
+  <!-- Screen 2 — The Question -->
+  <section id="screen-2" data-screen="question">
+    <div class="container screen-question__container">
+
+      <div class="screen-question__text">
+        <h2 class="screen-question__heading">Everyone asks how much they have.<br>Almost nobody can answer how long they're covered.</h2>
+        <p class="screen-question__body">A balance tells you about today. It doesn't tell you whether your home is safe next year, or the year after that. Global Reserve answers the second question — it reads everything you hold, everything you owe on housing, and turns it into time.</p>
+        <div class="screen-question__stat">
+          <p class="screen-question__stat-label">Years of housing covered</p>
+          <p class="screen-question__stat-value">for example, eight and a half</p>
+          <p class="screen-question__caption">Your own number depends on your position and your obligations.</p>
+        </div>
+      </div>
+
+      <div class="media-slot screen-question__media" data-slot="--media-question" aria-hidden="true">
+        <canvas class="screen-question__canvas" aria-hidden="true"></canvas>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Screen 3 — What RED actually is -->
+  <section id="screen-3" data-screen="red" hidden>
+    <h2>RED isn't money. It's housing, paid forward.</h2>
+  </section>
+
+  <!-- Screen 4 — Rewards -->
+  <section id="screen-4" data-screen="rewards" hidden>
+    <h2>When the system saves you money, you keep it.</h2>
+  </section>
+
+  <!-- Screen 5 — What your reserve is doing right now -->
+  <section id="screen-5" data-screen="states" hidden>
+    <h2>Your reserve is never just sitting there.</h2>
+  </section>
+
+  <!-- Screen 6 — The path to a home -->
+  <section id="screen-6" data-screen="path" hidden>
+    <h2>A home here doesn't start with a signature.<br>It starts with holding steady.</h2>
+  </section>
+
+  <!-- Screen 7 — Gia -->
+  <section id="screen-7" data-screen="gia" hidden>
+    <h2>Gia isn't a chat window. She's the reason this feels simple.</h2>
+  </section>
+
+  <!-- Screen 8 — Transparency -->
+  <section id="screen-8" data-screen="transparency" hidden>
+    <h2>Nothing happens quietly.</h2>
+  </section>
+
+  <!-- Screen 9 — The honest part -->
+  <section id="screen-9" data-screen="honest" hidden>
+    <h2>Here's what this isn't.</h2>
+  </section>
+
+  <!-- Screen 10 — CTA -->
+  <section id="screen-10" data-screen="cta" hidden>
+    <h2>You don't need a plan yet.<br>You just need to see where you stand.</h2>
+  </section>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="script.js"></script>
+  <script src="js/scrub.js"></script>
+  <script src="js/timescale.js"></script>
 </body>
 </html>
