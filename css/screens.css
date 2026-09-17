@@ -403,3 +403,73 @@
     padding: 24px;
   }
 }
+
+/* ── Screen 4 — Rewards ──
+   Compact dark section: centered text block, then a full-width
+   canvas strip. No card, no shadow, no border, no gradient. */
+
+#screen-4 {
+  position: relative;
+  min-height: 60svh;
+  display: flex;
+  align-items: center;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+  padding-block: clamp(72px, 8vw, 96px);
+}
+
+#screen-4 .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.screen-rewards__container {
+  width: 100%;
+  text-align: center;
+}
+
+.screen-rewards__heading {
+  max-width: 720px;
+  margin-inline: auto;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+}
+
+.screen-rewards__body {
+  max-width: 720px;
+  margin-inline: auto;
+  margin-top: 24px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+}
+
+.screen-rewards__lead {
+  max-width: 720px;
+  margin-inline: auto;
+  margin-top: 16px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.65;
+  color: var(--gr-text-secondary);
+}
+
+.screen-rewards__strip {
+  width: 100%;
+  height: clamp(72px, 8vw, 120px);
+  max-height: 120px;
+  margin-top: 32px;
+}
+
+@media (max-width: 768px) {
+  #screen-4 .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
