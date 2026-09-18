@@ -58,20 +58,22 @@ Rules for the existing code:
 /css/tokens.css           Design tokens only (Section 4)
 /css/base.css             Reset, typography, container, utilities
 /css/screens.css          Per-screen layout
+/css/reserve-hologram.css Screen 5.5 projection layout and responsive states
 /js/scrub.js              Screen 1 scroll-to-video-time binding (moved from script.js, logic unchanged). Locked to Screen 1 — nothing else reads from it
 /js/video-reveal.js       Screen 4.5 clip-path reveal, overlay, headline, and background-video visibility (see Section 5.4a)
 /js/reveal.js             IntersectionObserver reveal for screens 2-10
 /js/ticker.js             Screen 8 marquee
 /js/counter.js            Screen 4 counter animation (see Section 7)
 /js/timescale.js          Screen 2 balance-to-time animation (see Section 7)
-/js/hologram.js           Screen 5 detail-panel open/close (see Section 5.5a)
+/js/reserve-hologram.js   Screen 5.5 scroll-driven vault projection (see Section 5.5a)
 /media/                   All video and image assets
 /media/reveal-vault.mp4   Screen 4.5 background video, remuxed (stream copy, no re-encode) from the supplied clip (see Section 5.4a)
+/media/reserve-hologram-bg.webp  Screen 5.5 clean vault background, without interface or text
 ```
 
 - Vanilla HTML/CSS/JS. No npm, no bundler, no TypeScript, no Tailwind, no React.
-- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"`, plus `id="screen-4-5"` for the new scroll-video reveal inserted between Screens 4 and 5.
-- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `reveal`, `states`, `path`, `gia`, `transparency`, `honest`, `cta`.
+- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"`, plus `id="screen-4-5"` for the scroll-video reveal and `id="screen-5-5"` for the reserve hologram inserted between Screens 5 and 6.
+- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `reveal`, `states`, `reserve-demo`, `path`, `gia`, `transparency`, `honest`, `cta`.
 - Serve locally with `python3 -m http.server`. The blob fetch in the scrub script does not work over `file://`.
 
 ---
@@ -258,45 +260,72 @@ Bar: height 56px, `border-radius: 999px`, 1.5px border `--gr-line`, four segment
 
 The four state names are product terminology. Do not rename them to `Available`, `Locked`, `Pending`, or anything else.
 
-### 5.5a Screen 5 — Reserve Detail Hologram (interactive popup)
+### 5.5a Screen 5.5 — Reserve Hologram in the Vault (scroll-driven product demonstration)
 
-Screen 5 gets one addition: a small text link under the closing line opens a hologram-style detail panel — the same visual language Global Reserve uses inside the product — so a visitor can see, once, what the four states look like with numbers attached. It never opens on its own. It opens only when clicked, and it closes on Escape, on a click outside the card, or via its own close button.
+This is a new independent section inserted between Screen 5 and Screen 6. It replaces the former click-open modal. The visitor first reads the calm explanation of the four states on Screen 5, then scrolls into a full-viewport vault scene where the example product interface assembles automatically. The complete interface must be visible without a click.
 
-Every number inside the panel is a labelled example, not a live balance. The panel exists to demonstrate the interface, not to suggest the visitor already has an account. Follow the "for example" pattern already used in the Screen 2 stat line — every value here carries the same qualifier, spoken once at the top of the card and repeated in each figure's caption.
+This is not one pre-rendered video. Use a clean vault image as the background and build the projection, SVG ring, labels, and values as HTML/CSS/SVG so the copy remains sharp, editable, accessible, responsive, and reversible on scroll. The supplied concept image is a composition reference only and must not be inserted as the finished interface.
 
-New tokens for `/css/tokens.css`, used only by this panel:
+**Section structure and asset:**
 
-- `--gr-holo-bg`: `rgba(11, 18, 32, .72)` — backdrop behind the card
-- `--gr-holo-panel`: `#111A2D` — card fill
-- `--gr-holo-border`: `rgba(93, 169, 255, .55)` — 1px card border
-- `--gr-holo-glow`: `0 0 24px rgba(93,169,255,.35), 0 0 64px rgba(93,169,255,.15)` — card box-shadow
-- `--gr-holo-text`: `#F1F5FB` — card text
-- `--gr-holo-accent`: `var(--gr-accent)` — ring and figures reuse the site's existing gold, tying the panel back to the rest of the page
+- Section: `id="screen-5-5"`, `data-screen="reserve-demo"`, height `300vh`.
+- Inner stage: `position: sticky; top: 0; height: 100vh; overflow: hidden`.
+- Background: `media/reserve-hologram-bg.webp`, 1920x1080, clean vault scene with no interface or text, rendered full-bleed with `object-fit: cover`.
+- The small bronze projector base may be baked into the background. Its beam and glow are separate decorative CSS elements with `aria-hidden="true"`.
+- Projection plane: one unified wide translucent dark-navy surface, not four detached floating cards; desktop maximum approximately `1100px × 620px`, with the warm vault architecture remaining visible around it.
 
-This is the one place on the page that leaves the warm paper palette for a dark, glowing treatment — deliberately, so the panel reads as a window into the live product rather than another marketing block. Flag to design for review before build.
+**Visual treatment:**
 
-| Element | Copy | Style | Position |
-|---|---|---|---|
-| Trigger | `View a live example` | `--fs-caption`, `--gr-ink-2`, underline on hover/focus | center, below the closing line |
-| Panel container | Full-viewport modal: dimmed backdrop (`--gr-holo-bg`) over the page, centered card. | Card: `--gr-holo-panel` fill, 1px `--gr-holo-border`, `--gr-holo-glow` shadow, `border-radius: 20px`, max-width 720px, padding 48px | center overlay |
-| Disclaimer | `For example — not your account.` | `--fs-caption`, `--gr-holo-text` at 70% opacity, top of card | center |
-| Center ring | `for example, 82% / Ready` | `--fs-stat` scaled to 56px, `--gr-holo-accent`; ring stroke 3px `--gr-holo-accent` on a 3px `rgba(255,255,255,.12)` track | center |
-| Card — Ready | `for example, $42,800 / Free to use today` | `--fs-item-title` value, `--fs-small` caption, `--gr-holo-text` | top-left |
-| Card — Reserved | `for example, $18,000 / Holding a home you already have` | same | top-right |
-| Card — Scheduled | `for example, 90 days / Arriving on its own timeline` | same | bottom-left |
-| Card — Committed | `for example, 78% / Toward a property you're working on` | same | bottom-right |
-| Connector glyphs | Three small decorative dots linking the ring to the cards. No labels. | 1px `--gr-holo-border` lines; `aria-hidden="true"` | decorative only |
-| Close control | `×` | icon button, `aria-label="Close"`, `--gr-holo-text` | top-right corner of card |
+- Restrained transparent dark-navy plane, thin electric-blue structural lines, white primary text, muted cool-gray secondary text, and bronze-gold key figures.
+- Blue is a technical accent, not the dominant colour. Keep glow narrow and low-opacity so the scene stays calm, precise, and premium.
+- No thick neon borders, gaming HUD styling, excessive connector lines, large cyan bloom, modal backdrop, close control, glassmorphism blur, or four separate glowing cards.
+- The central ring is SVG. Use a muted track and a bronze-gold progress stroke ending at 82%.
 
-Motion and accessibility for this panel:
+**Exact interface copy:**
 
-- Opens only on click of the trigger link — never on scroll, never on load, never automatically.
-- On open: card fades and scales in 300ms; the ring stroke draws in over 700ms ease-out. Under `prefers-reduced-motion: reduce`, both appear at final state with a single 150ms opacity fade and the ring is drawn complete, not animated.
-- `role="dialog"` `aria-modal="true"`, labelled by the ring's caption. Focus moves to the close button on open and returns to the trigger link on close.
-- Escape and a click on the backdrop both close the panel, same as the close button.
-- Implemented as `js/hologram.js`, exporting a single `initHologram(el)` function. No globals, no dependency on the Screen 5 reveal or bar logic.
+| Element | Copy | Position |
+|---|---|---|
+| Eyebrow | `GLOBAL RESERVE®` | top centre |
+| Heading | `Your reserve at a glance` | below eyebrow |
+| Disclaimer | `Example interface — not your account.` | below heading; remains visible whenever example figures are visible |
+| Centre | `82%` / `Ready` | central SVG ring |
+| Ready | `$42,800` / `Free to use today` | top-left |
+| Reserved | `$18,000` / `Holding a home you already have` | top-right |
+| Scheduled | `90 days` / `Arriving on its own timeline` | bottom-left |
+| Committed | `78%` / `Toward a property you're working on` | bottom-right |
 
-The four card labels (`Ready`, `Reserved`, `Scheduled`, `Committed`) are the same product terminology as the bar above — do not introduce different names for the same states inside the panel.
+The four state names are locked product terminology: `Ready`, `Committed`, `Reserved`, `Scheduled`. Do not replace them with `Available`, `Locked`, `Pending`, `Future Unlocks`, `Qualification Progress`, or any other label. The disclaimer qualifies every figure in this section as an example; do not repeat "for example" inside every state summary.
+
+**Scroll sequence:**
+
+Use the current project's existing GSAP/scroll-progress setup; do not add another animation library. Map normalized section progress from `0` to `1` and keep the complete sequence reversible when scrolling upward.
+
+| Progress | State |
+|---:|---|
+| `0.00–0.12` | Vault only; no projection |
+| `0.12–0.24` | Projector glow and restrained vertical beam appear |
+| `0.20–0.38` | One unified projection plane forms from the base |
+| `0.34–0.46` | Eyebrow, heading, and disclaimer reveal |
+| `0.42–0.60` | SVG ring draws to 82%; `82%` and `Ready` reveal |
+| `0.55–0.75` | State summaries reveal in this order: Ready, Reserved, Scheduled, Committed |
+| `0.75–0.90` | Full composition holds, stable and readable |
+| `0.90–1.00` | Summaries fade, ring closes, projection lowers, and Screen 6 follows |
+
+Each state summary uses only a small `translateY(12px -> 0)` plus opacity. Do not animate layout dimensions or add parallax. The vault background remains visually stable while the projection assembles.
+
+**Implementation and isolation:**
+
+- Implement in `js/reserve-hologram.js` and `css/reserve-hologram.css`.
+- Export one `initReserveHologram(el)` function. No globals.
+- Do not import from, edit, or depend on `js/scrub.js`; Screen 1 remains locked.
+- This section is not a dialog, has no focus trap, does not open on click, and has no close button.
+- Pause any continuous decorative work while the section is outside the viewport.
+
+**Responsive and reduced motion:**
+
+- Desktop: central ring with a two-by-two arrangement of state summaries.
+- At `768px` and below: ring above the summaries; summaries become one vertical list; no horizontal scrolling; all copy remains readable.
+- Under `prefers-reduced-motion: reduce`: remove the pin and all scroll animation, show one complete static composition with the ring and all four summaries visible, and preserve the disclaimer.
 
 ### 5.6 Screen 6 — The path to a home
 
@@ -406,6 +435,7 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | `--media-question` | 2 | `media/time-scale.mp4` | 1080x1080 | 4-6s | Plays once when the section reaches 40% of the viewport, then holds the last frame. May be generated instead — Section 7.1 |
 | `--media-red` | 3 | `media/red-object.webp` | 800x800, transparent | still | Static. Optional 8-10s loop if a video version is supplied |
 | `--media-counter` | 4 | `media/rewards-ticker.mp4` | 1920x200 | 8s | Loop. May be generated instead — Section 7.2 |
+| `--media-reserve-demo` | 5.5 | `media/reserve-hologram-bg.webp` | 1920x1080 | still | Clean vault background only; hologram interface is built in HTML/CSS/SVG and controlled by scroll |
 | `--media-home` | 6 | `media/home.jpg` | 1200x1400, 4:5 | still | Static photograph |
 | `--media-gia` | 7 | `media/gia.mp4` | 1080x1350, 4:5 | 12-18s | Loop, muted, `playsinline`, poster `media/gia-poster.jpg` |
 | `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720 | 8-10s | Loop, muted, slowed |
@@ -445,9 +475,9 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 
 ## 8. MOTION, ACCESSIBILITY, PERFORMANCE
 
-1. Scroll reveal for Screens 2-10: opacity `0 -> 1` and `translateY(24px -> 0)`, 600ms, `cubic-bezier(.22,.61,.36,1)`, triggered once at 25% visibility via `IntersectionObserver`. Nothing else animates on scroll.
-2. No parallax, no pinned sections other than Screen 1 and Screen 4.5, no horizontal scroll, no scroll hijacking.
-3. `@media (prefers-reduced-motion: reduce)`: disable reveal, marquee, bubbles, and generated animations; show final frames; Screen 1 shows a single static frame with its text visible. Screen 4.5 is fully static too: no pin, its clip-path/overlay/headline hold at their resting state without animating, and its background video has `autoplay`/`loop` turned off via JavaScript and is paused on a single stable frame (in normal motion, that same video plays continuously and is untouched by this rule).
+1. Scroll reveal for ordinary Screens 2-10: opacity `0 -> 1` and `translateY(24px -> 0)`, 600ms, `cubic-bezier(.22,.61,.36,1)`, triggered once at 25% visibility via `IntersectionObserver`. Screen 4.5 and Screen 5.5 use only their own explicitly specified scroll sequences.
+2. No parallax, no pinned sections other than Screen 1, Screen 4.5, and Screen 5.5, no horizontal scroll, no scroll hijacking.
+3. `@media (prefers-reduced-motion: reduce)`: disable reveal, marquee, bubbles, and generated animations; show final frames; Screen 1 shows a single static frame with its text visible. Screen 4.5 is fully static too: no pin, its clip-path/overlay/headline hold at their resting state without animating, and its background video has `autoplay`/`loop` turned off via JavaScript and is paused on a single stable frame. Screen 5.5 also loses its pin and displays the complete hologram composition statically with every label and the example disclaimer visible.
 4. Semantic markup: one `<h1>` (Screen 1) and `<h2>` for every other screen. Buttons that navigate are `<a>`. Decorative media gets `aria-hidden="true"` and empty `alt`.
 5. Keyboard: visible focus ring, logical tab order, no positive `tabindex`.
 6. Contrast: all text meets WCAG AA. Over video, rely on the text shadow plus a `rgba(0,0,0,.25)` overlay if a measurement fails.
@@ -462,14 +492,15 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 Before reporting done, verify each item and state the result:
 
 - [ ] No Cyrillic character exists anywhere in the repository output. Verify with `grep -rPl "[\x{0400}-\x{04FF}]" --include=* .` over the files you created or edited, excluding the three original `.md` reference files.
-- [ ] All ten numbered screens plus the Screen 4.5 reveal exist with correct ids and `data-screen` values (eleven sections total).
+- [ ] All ten numbered screens plus Screen 4.5 and Screen 5.5 exist with correct ids and `data-screen` values (twelve sections total).
 - [ ] Every string on the page matches Section 5 character for character.
 - [ ] Screen 1 still scrubs on scroll and its text coordinates are unchanged.
 - [ ] Missing media assets render the placeholder, and the page still lays out correctly.
 - [ ] Screens 4 and 8 contain no digits.
-- [ ] The Screen 5 hologram panel opens only on click, is fully keyboard-operable (focus trap, Escape, backdrop click), and every value inside it is explicitly labelled "for example."
+- [ ] Screen 5.5 appears automatically during normal page scroll, uses one unified projection plane, reveals Ready, Reserved, Scheduled, and Committed in the specified order, holds the complete readable composition, and reverses correctly on upward scroll. It is not a modal and is not gated behind a click.
+- [ ] Screen 5.5 shows `Example interface — not your account.` whenever example figures are visible; its interface text is HTML/SVG rather than baked into the background image.
 - [ ] In normal motion, Screen 4.5's video autoplays, loops, and is paused only while the section is fully out of view (`IntersectionObserver`); scroll drives only the clip-path reveal/contraction (no layout shift), overlay, and headline. Under `prefers-reduced-motion`, the mask/overlay/headline hold at rest and the video itself is paused on a single stable frame (`autoplay`/`loop` off via JavaScript) — a fully static composition.
-- [ ] Screen 1 and Screen 4.5 are the only two pinned sections on the page.
+- [ ] Screen 1, Screen 4.5, and Screen 5.5 are the only three pinned sections on the page.
 - [ ] The Gia video element exists with `muted`, `loop`, `playsinline`, and a poster.
 - [ ] Layout is correct at 1920, 1440, 1024, 768, and 375 CSS pixels.
 - [ ] `prefers-reduced-motion` produces a fully static, readable page.
@@ -483,11 +514,11 @@ Use these in order. Each assumes this document is open in the workspace as `BUIL
 
 **A1 — Scaffold**
 
-> Read BUILD-SPEC.md. Follow Rule 0 strictly: English only in all output, no Cyrillic anywhere. Restructure the project per Section 3 without changing how Screen 1 behaves, create the token files from Section 4, and scaffold empty sections for Screens 2-10 with correct ids, `data-screen` values, and headings only. Do not write any copy yet beyond the headings.
+> Read BUILD-SPEC.md. Follow Rule 0 strictly: English only in all output, no Cyrillic anywhere. Restructure the project per Section 3 without changing how Screen 1 behaves, create the token files from Section 4, and scaffold empty sections for Screens 2-10 plus Screen 4.5 and Screen 5.5 with correct ids, `data-screen` values, and headings only. Do not write any copy yet beyond the headings.
 
 **A2 — Copy and layout, in batches**
 
-> Read BUILD-SPEC.md Section 5.2 to 5.5 and build Screens 2 through 5, including the Section 5.4a video reveal between them: markup, copy verbatim, layout, responsive behaviour at the 768px breakpoint. Use the media placeholder from Section 6 for every media slot. English only.
+> Read BUILD-SPEC.md Section 5.2 through 5.5a and build Screens 2 through 5 plus the independent Screen 4.5 and Screen 5.5 sections between them: markup, copy verbatim, layout, scroll behaviour, reduced-motion fallback, and responsive behaviour at the 768px breakpoint. Use the media placeholder from Section 6 for every media slot. Screen 5.5 is not a modal and must not be hidden behind a click. English only.
 
 > Now do the same for Sections 5.6 to 5.8, then 5.9 to 5.10.
 
@@ -515,7 +546,7 @@ These are product terms. Use exactly this spelling and capitalisation, and never
 
 Never introduce on this page: `GD`, `Glonari Dollars`, `Future RED`, `Global Dream`, `DBR`, `Experience Capacity`, tier names, percentages, yields, cost bases, or any specific balance figure. If a task seems to require one, stop and ask.
 
-Exception: inside the Screen 5.5a hologram panel only, illustrative example figures (dollar amounts, percentages, a day count) are permitted, each one explicitly marked "for example" per Section 5.5a. This does not lift the restriction anywhere else on the page — Screens 1–10 and their copy remain governed by the rule above.
+Exception: inside the independent Screen 5.5 reserve hologram only, the illustrative example figures specified in Section 5.5a are permitted. The persistent disclaimer `Example interface — not your account.` qualifies all of them. This does not lift the restriction anywhere else on the page — Screens 1–10 and their copy remain governed by the rule above.
 
 ---
 
