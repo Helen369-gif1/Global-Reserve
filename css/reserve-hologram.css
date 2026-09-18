@@ -1,0 +1,569 @@
+/* ── Screen 5.5 — Reserve Hologram in the Vault (Build Spec Section 5.5a) ──
+   Independent section between Screen 5 and Screen 6. Everything here is
+   namespaced under `.reserve-hologram__` and lives only in this file —
+   nothing here is shared with or read by css/screens.css. The panel is a
+   restrained transparent dark-navy plane with thin electric-blue structural
+   lines; blue is a technical accent only, never the dominant colour. All
+   interface text is real HTML, the ring is an inline animatable SVG, and
+   the vault photo is a plain full-bleed background image — the composition
+   is assembled and revealed by js/reserve-hologram.js, not baked into art.
+
+   Elements that fade/rise in on scroll start from a hidden CSS default
+   (opacity/transform/stroke-dashoffset) so there is no flash of a fully
+   assembled panel before the script runs, matching the .word{opacity:0}
+   pattern already used for Screen 1 and Screen 4.5's text reveals.
+
+   Per the current task: once assembled, the composition holds — there is
+   no exit fade. The panel, beam, glow, and all text stay fully visible
+   through the end of the runway; the section only leaves the viewport
+   naturally as the sticky pin releases. */
+
+#screen-5-5 {
+  --rh-navy-1: rgba(10, 28, 51, 0.85);
+  --rh-navy-2: rgba(5, 13, 26, 0.9);
+  --rh-blue: #82c0fa;
+  --rh-blue-bright: #bcdcff;
+  --rh-blue-line: rgba(130, 192, 250, 0.55);
+  --rh-blue-line-soft: rgba(130, 192, 250, 0.2);
+  --rh-blue-glow: rgba(130, 192, 250, 0.18);
+  --rh-ring-circumference: 703.72;
+  --rh-ring-offset-final: 126.67; /* 82% drawn */
+  position: relative;
+}
+
+.reserve-hologram__wrapper {
+  height: 420vh;
+  position: relative;
+}
+
+.reserve-hologram__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--gr-void);
+}
+
+/* ── Background ── */
+
+.reserve-hologram__bg {
+  position: absolute;
+  inset: 0;
+}
+
+.reserve-hologram__bg-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Scene: centers the rig, independent of the background crop ── */
+
+.reserve-hologram__scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: clamp(20px, 4vw, 48px);
+}
+
+.reserve-hologram__rig {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1140px;
+}
+
+/* ── Panel ──
+   A chamfered octagon (24-unit corner cuts on a 1119x599 canvas, matching
+   the source design's panel proportions) drawn by an SVG frame that
+   stretches with preserveAspectRatio="none" — the same technique the
+   supplied panel source used for its own background/divider art. Fill,
+   stroke, and a soft blurred glow duplicate are three stacked copies of
+   the same polygon. Real HTML content sits on top at z-index 1. */
+
+.reserve-hologram__panel {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  aspect-ratio: 1119 / 599;
+  max-height: 82svh;
+  opacity: 0;
+  transform: translateY(26px) scaleY(0.94);
+  transform-origin: 50% 100%;
+}
+
+.reserve-hologram__panel-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.reserve-hologram__panel-glow-shape {
+  fill: none;
+  stroke: var(--rh-blue);
+  stroke-width: 5;
+  stroke-opacity: 0.35;
+}
+
+.reserve-hologram__panel-stroke-shape {
+  stroke: var(--rh-blue-bright);
+  stroke-width: 1.6;
+  stroke-opacity: 0.85;
+}
+
+.reserve-hologram__panel-edge-glow {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 0;
+  height: 30%;
+  background: linear-gradient(to top, var(--rh-blue-glow), rgba(130, 192, 250, 0));
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.reserve-hologram__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(18px, 2.6vw, 40px) clamp(28px, 5vw, 64px);
+}
+
+/* ── Header ── */
+
+.reserve-hologram__header {
+  position: relative;
+  text-align: center;
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.reserve-hologram__header-lines {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  transform: translateX(-50%);
+  width: min(160%, 640px);
+  height: 1px;
+  opacity: 0;
+}
+
+.reserve-hologram__header-lines-img {
+  display: block;
+  width: 100%;
+  height: 1px;
+}
+
+.reserve-hologram__eyebrow,
+.reserve-hologram__heading,
+.reserve-hologram__disclaimer {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.reserve-hologram__eyebrow {
+  position: relative;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: clamp(11px, 1vw, 13px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--gr-bronze);
+}
+
+.reserve-hologram__heading {
+  margin-top: 8px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(20px, 2.6vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--gr-text-primary);
+}
+
+.reserve-hologram__disclaimer {
+  margin-top: 6px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(11px, 1vw, 14px);
+  color: var(--gr-text-tertiary);
+}
+
+/* ── Body: ring + two state columns + decorative dividers ── */
+
+.reserve-hologram__body {
+  position: relative;
+  margin-top: clamp(14px, 2.6vw, 32px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    'ready    ring reserved'
+    'scheduled ring committed';
+  align-items: center;
+  column-gap: clamp(16px, 3vw, 40px);
+  row-gap: clamp(16px, 2.6vw, 28px);
+}
+
+.reserve-hologram__divider {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  width: clamp(120px, 15vw, 210px);
+  aspect-ratio: 288.002 / 338;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reserve-hologram__divider--left {
+  left: 0;
+}
+
+.reserve-hologram__divider--right {
+  right: 0;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+.reserve-hologram__divider-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.reserve-hologram__stat {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.reserve-hologram__stat[data-state='ready'] {
+  grid-area: ready;
+  text-align: right;
+}
+.reserve-hologram__stat[data-state='scheduled'] {
+  grid-area: scheduled;
+  text-align: right;
+}
+.reserve-hologram__stat[data-state='reserved'] {
+  grid-area: reserved;
+  text-align: left;
+}
+.reserve-hologram__stat[data-state='committed'] {
+  grid-area: committed;
+  text-align: left;
+}
+
+.reserve-hologram__stat-label {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(13px, 1.2vw, 17px);
+  color: var(--gr-text-primary);
+}
+
+.reserve-hologram__stat-value {
+  margin-top: 4px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(19px, 2.2vw, 28px);
+  line-height: 1.15;
+  color: var(--gr-bronze);
+  white-space: nowrap;
+}
+
+.reserve-hologram__stat-caption {
+  margin-top: 4px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(11px, 1vw, 13px);
+  line-height: 1.4;
+  color: var(--gr-text-tertiary);
+  max-width: 220px;
+}
+
+.reserve-hologram__stat[data-state='ready'] .reserve-hologram__stat-caption,
+.reserve-hologram__stat[data-state='scheduled'] .reserve-hologram__stat-caption {
+  margin-left: auto;
+}
+
+/* ── Footer accent (decorative only — no link, no "Explore the example") ── */
+
+.reserve-hologram__footer-accent {
+  width: 64px;
+  height: 2px;
+  margin: clamp(14px, 2vw, 24px) auto 0;
+  background: linear-gradient(to right, transparent, var(--rh-blue-line), transparent);
+  opacity: 0;
+}
+
+/* ── Progress ring ──
+   Several concentric circles standing in for the reference's layered glow
+   ring: a blurred outer glow, a crisp outer hairline, a dark inner disc,
+   a dashed ring of small technical tick marks, a muted track, and — the
+   only one the timeline actually animates — the bronze progress stroke. */
+
+.reserve-hologram__ring {
+  grid-area: ring;
+  position: relative;
+  z-index: 1;
+  width: clamp(150px, 15.5vw, 240px);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reserve-hologram__ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.reserve-hologram__ring-outer-glow {
+  fill: none;
+  stroke: var(--rh-blue);
+  stroke-width: 2;
+  stroke-opacity: 0.35;
+}
+
+.reserve-hologram__ring-outer {
+  fill: none;
+  stroke: var(--rh-blue-line-soft);
+  stroke-width: 1;
+}
+
+.reserve-hologram__ring-disc {
+  fill: rgba(4, 12, 26, 0.72);
+  stroke: var(--rh-blue-line-soft);
+  stroke-width: 1;
+}
+
+.reserve-hologram__ring-ticks {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2;
+  stroke-dasharray: 1.5 9;
+}
+
+.reserve-hologram__ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 11;
+}
+
+.reserve-hologram__ring-progress {
+  fill: none;
+  stroke: var(--gr-bronze);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-dasharray: var(--rh-ring-circumference);
+  stroke-dashoffset: var(--rh-ring-circumference);
+}
+
+.reserve-hologram__ring-text {
+  position: relative;
+  text-align: center;
+}
+
+.reserve-hologram__ring-percent,
+.reserve-hologram__ring-label {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.reserve-hologram__ring-percent {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1;
+  color: var(--gr-bronze);
+}
+
+.reserve-hologram__ring-label {
+  margin-top: 4px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: clamp(13px, 1.2vw, 17px);
+  color: var(--gr-text-primary);
+}
+
+/* ── Beam: a wide projection cone, not a thin line ──
+   An SVG trapezoid (soft fill + two brighter edge lines + a bright core)
+   stretched between the panel's underside and the projector base baked
+   into the vault photo, plus a separate floor bloom/glow group. */
+
+.reserve-hologram__beam {
+  width: clamp(220px, 34vw, 460px);
+  aspect-ratio: 400 / 240;
+  margin-top: clamp(-6px, -0.6vw, -2px);
+  opacity: 0;
+}
+
+.reserve-hologram__beam-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.reserve-hologram__beam-edge {
+  stroke: var(--rh-blue-bright);
+  stroke-width: 2;
+  stroke-opacity: 0.5;
+}
+
+.reserve-hologram__base-glow {
+  position: relative;
+  width: 100%;
+  height: clamp(30px, 5svh, 60px);
+  margin-top: -6px;
+  opacity: 0;
+}
+
+.reserve-hologram__floor-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(160px, 20vw, 280px);
+  height: clamp(26px, 3.4vw, 50px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(130, 192, 250, 0.35), rgba(130, 192, 250, 0));
+  filter: blur(6px);
+}
+
+.reserve-hologram__base-bloom {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(46px, 6vw, 84px);
+  height: clamp(46px, 6vw, 84px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.9),
+    rgba(130, 192, 250, 0.55) 45%,
+    rgba(130, 192, 250, 0) 75%
+  );
+}
+
+/* ── Responsive: 768px and below ──
+   The full desktop beam/glow group is a projector-room effect that only
+   reads correctly against the wide vault backdrop; below 768px the panel
+   itself is the whole composition, stacked as a single readable column. */
+
+@media (max-width: 768px) {
+  .reserve-hologram__scene {
+    padding-inline: 20px;
+    align-items: center;
+  }
+
+  .reserve-hologram__panel {
+    aspect-ratio: auto;
+    max-height: 86svh;
+  }
+
+  .reserve-hologram__content {
+    padding: 18px 20px;
+  }
+
+  .reserve-hologram__beam,
+  .reserve-hologram__base-glow {
+    display: none;
+  }
+
+  .reserve-hologram__divider {
+    display: none;
+  }
+
+  .reserve-hologram__body {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'ring'
+      'ready'
+      'reserved'
+      'scheduled'
+      'committed';
+    row-gap: 12px;
+    margin-top: 14px;
+  }
+
+  .reserve-hologram__ring {
+    width: clamp(110px, 32vw, 150px);
+    margin-inline: auto;
+  }
+
+  .reserve-hologram__stat {
+    text-align: center !important;
+  }
+
+  .reserve-hologram__stat-caption {
+    max-width: none;
+    margin-left: auto !important;
+    margin-right: auto;
+  }
+
+  .reserve-hologram__heading {
+    font-size: clamp(18px, 5vw, 22px);
+  }
+
+  .reserve-hologram__header-lines {
+    display: none;
+  }
+}
+
+/* ── Reduced motion: static fallback (JS also sets the same hold state) ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .reserve-hologram__wrapper {
+    height: auto;
+  }
+
+  .reserve-hologram__sticky {
+    position: static;
+    height: 100svh;
+  }
+
+  .reserve-hologram__panel,
+  .reserve-hologram__header-lines,
+  .reserve-hologram__eyebrow,
+  .reserve-hologram__heading,
+  .reserve-hologram__disclaimer,
+  .reserve-hologram__stat,
+  .reserve-hologram__ring-percent,
+  .reserve-hologram__ring-label,
+  .reserve-hologram__beam,
+  .reserve-hologram__base-glow,
+  .reserve-hologram__footer-accent {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reserve-hologram__divider {
+    opacity: 1;
+  }
+
+  .reserve-hologram__divider--left {
+    transform: translateY(-50%);
+  }
+
+  .reserve-hologram__divider--right {
+    transform: translateY(-50%) scaleX(-1);
+  }
+
+  .reserve-hologram__ring-progress {
+    stroke-dashoffset: var(--rh-ring-offset-final);
+  }
+}

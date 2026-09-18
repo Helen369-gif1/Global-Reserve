@@ -268,7 +268,7 @@ This is not one pre-rendered video. Use a clean vault image as the background an
 
 **Section structure and asset:**
 
-- Section: `id="screen-5-5"`, `data-screen="reserve-demo"`, height `300vh`.
+- Section: `id="screen-5-5"`, `data-screen="reserve-demo"`, height `420vh`.
 - Inner stage: `position: sticky; top: 0; height: 100vh; overflow: hidden`.
 - Background: `media/reserve-hologram-bg.webp`, 1920x1080, clean vault scene with no interface or text, rendered full-bleed with `object-fit: cover`.
 - The small bronze projector base may be baked into the background. Its beam and glow are separate decorative CSS elements with `aria-hidden="true"`.
@@ -302,16 +302,15 @@ Use the current project's existing GSAP/scroll-progress setup; do not add anothe
 
 | Progress | State |
 |---:|---|
-| `0.00–0.12` | Vault only; no projection |
-| `0.12–0.24` | Projector glow and restrained vertical beam appear |
-| `0.20–0.38` | One unified projection plane forms from the base |
-| `0.34–0.46` | Eyebrow, heading, and disclaimer reveal |
-| `0.42–0.60` | SVG ring draws to 82%; `82%` and `Ready` reveal |
-| `0.55–0.75` | State summaries reveal in this order: Ready, Reserved, Scheduled, Committed |
-| `0.75–0.90` | Full composition holds, stable and readable |
-| `0.90–1.00` | Summaries fade, ring closes, projection lowers, and Screen 6 follows |
+| `0.00–0.10` | Vault only; no projection |
+| `0.10–0.24` | Projector glow and projection beam appear |
+| `0.18–0.44` | The unified projection plane gradually builds from the base |
+| `0.30–0.50` | Eyebrow, heading, disclaimer, and decorative lines reveal |
+| `0.40–0.64` | SVG ring draws to 82%; `82%` and `Ready` reveal |
+| `0.52–0.78` | State summaries reveal in this order: Ready, Reserved, Scheduled, Committed |
+| `0.78–1.00` | Full composition holds, fully visible and readable — no exit fade |
 
-Each state summary uses only a small `translateY(12px -> 0)` plus opacity. Do not animate layout dimensions or add parallax. The vault background remains visually stable while the projection assembles.
+There is no exit phase: the panel, beam, glow, and all text remain fully visible for the rest of the runway once assembled. The section only leaves the viewport because the sticky pin ends, not because anything fades out. Each state summary uses only a small `translateY(12px -> 0)` plus opacity. Do not animate layout dimensions or add parallax. The vault background remains visually stable while the projection assembles.
 
 **Implementation and isolation:**
 
