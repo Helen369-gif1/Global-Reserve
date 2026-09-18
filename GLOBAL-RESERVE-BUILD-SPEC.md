@@ -17,7 +17,7 @@ This document is written in English. It ends with **Appendix D**, which is writt
 
 ## 1. WHAT WE ARE BUILDING
 
-A single-page marketing site for **GLOBAL RESERVE®**, a product inside the Glonari platform. Ten full-height screens, scrolled top to bottom, roughly one minute of reading.
+A single-page marketing site for **GLOBAL RESERVE®**, a product inside the Glonari platform. Ten full-height screens, scrolled top to bottom, roughly one minute of reading — plus one short scroll-triggered video reveal inserted between Screens 4 and 5 (Section 5.4a).
 
 It is a static site. No framework, no build step, no backend, no analytics, no cookie banner.
 
@@ -58,17 +58,20 @@ Rules for the existing code:
 /css/tokens.css           Design tokens only (Section 4)
 /css/base.css             Reset, typography, container, utilities
 /css/screens.css          Per-screen layout
-/js/scrub.js              Screen 1 scroll-scrub (moved from script.js, logic unchanged)
+/js/scrub.js              Screen 1 scroll-to-video-time binding (moved from script.js, logic unchanged). Locked to Screen 1 — nothing else reads from it
+/js/video-reveal.js       Screen 4.5 clip-path reveal, overlay, headline, and background-video visibility (see Section 5.4a)
 /js/reveal.js             IntersectionObserver reveal for screens 2-10
 /js/ticker.js             Screen 8 marquee
 /js/counter.js            Screen 4 counter animation (see Section 7)
 /js/timescale.js          Screen 2 balance-to-time animation (see Section 7)
+/js/hologram.js           Screen 5 detail-panel open/close (see Section 5.5a)
 /media/                   All video and image assets
+/media/reveal-vault.mp4   Screen 4.5 background video, remuxed (stream copy, no re-encode) from the supplied clip (see Section 5.4a)
 ```
 
 - Vanilla HTML/CSS/JS. No npm, no bundler, no TypeScript, no Tailwind, no React.
-- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"`.
-- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `states`, `path`, `gia`, `transparency`, `honest`, `cta`.
+- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"`, plus `id="screen-4-5"` for the new scroll-video reveal inserted between Screens 4 and 5.
+- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `reveal`, `states`, `path`, `gia`, `transparency`, `honest`, `cta`.
 - Serve locally with `python3 -m http.server`. The blob fetch in the scrub script does not work over `file://`.
 
 ---
@@ -205,6 +208,37 @@ Media slot: `--media-counter` (or the generated animation, Section 7).
 
 The counter strip shows motion only. No currency, no digits that read as a real balance.
 
+### 5.4a Screen 4.5 — "This is what it's all for." (mask reveal over a looping video)
+
+A new, independent full-height section inserted between Screen 4 and Screen 5 — not a modification of either. One cinematic beat, no mechanics: an aerial night shot of a home slowly reveals to full-bleed as the visitor scrolls, one line of copy fades in over it, then it recedes into Screen 5. No eyebrow, no body copy, no buttons, no numbers.
+
+**Source footage.** The supplied aerial night clip (coastal homes, pools, warm lit windows, 1280×720, 6s, 30fps) is the reference mood and motion — very little camera movement, so it reads well as a calm, continuous loop rather than a busy pan.
+
+**Implementation — a real looping video, not a scroll-scrub.** Unlike Screen 1's hero, this video's `currentTime` is never touched by scroll: it plays as an ordinary `<video autoplay muted loop playsinline>`, running continuously on its own timeline the moment it's in view. Scroll drives only the presentation around it — the clip-path mask, the overlay, and the headline — through the section's own lightweight scroll-progress tracker in `/js/video-reveal.js`. This section does **not** call `bindScrollToVideo` (Section 2), which stays a Screen 1–only concern; the two screens' video needs are different (one is scrubbed frame-by-frame, one just plays), so they don't share that function. An `IntersectionObserver` on the section pauses the video once it's fully out of view and resumes it on return, so it never plays unnecessarily off-screen.
+
+**Behaviour:**
+
+- Section height: `320vh` scroll runway. Inner content is `position: sticky; top: 0; height: 100vh`, pinned for the full runway. This is the **second** pinned section on the page — Section 8's "no pinned sections other than Screen 1" rule is amended below to name both.
+- Video element: `media/reveal-vault.mp4`, `autoplay`, `muted`, `loop`, `playsinline`, `preload="auto"`, `object-fit: cover`. Remuxed from the supplied clip with a stream copy (`-c:v copy`, no re-encode) to keep the original quality exactly, since there's no seek-accuracy trade-off to make.
+- Reveal: the frame starts as a small rounded window, `clip-path: inset(43% 36% 43% 36% round 16px)`, and expands to full-bleed, `inset(0% 0% 0% 0% round 0px)`, over the first 45% of the section's scroll distance (`0%–45%`). `scrub`, not a fixed duration — the expansion is tied one-to-one to scroll position, `ease: none`.
+- Fully open, full-bleed hold: `45%–70%`.
+- Closing: `70%–100%`, contracting to a wide panoramic band — never fully closing and never staying near full-screen — `clip-path: inset(30% 20% 30% 20% round 20px)` (roughly 60% of the frame's width, 40% of its height). Fully reversible on scroll-back, same as the reveal.
+- No CSS zoom on the video. The source footage already carries its own camera motion; an added `scale()` transform amplified flicker in the night scene's fine detail, so the video renders at a constant `scale(1)` for the whole scroll range.
+- As the frame finishes expanding, a dark overlay fades to `rgba(0,0,0,.35)` and the headline fades in over it using the same per-word reveal technique as Screen 1's hero text (split into one `<span>` per word, then a paused GSAP timeline driven by `.time()`). It's implemented locally in `/js/video-reveal.js`, not shared from `/js/scrub.js` — that file is locked to Screen 1 (Section 2), so this section keeps its own small copy of the word-splitting helper rather than touching it.
+- The headline holds through the open phase, then starts fading (with a slight `translateY` lift) around `70%` and is fully gone by about `82%`, while the frame contracts per above and the overlay darkens to `.6`, cueing the transition into Screen 5.
+
+| Element | Copy | Style | Position |
+|---|---|---|---|
+| Headline | `This is what it's all for.` | `--fs-h1`, Playfair 500, `--gr-on-media`, text-shadow per Section 4 | centered, over the frame |
+
+No eyebrow, no body text, no buttons, no stat. If `media/reveal-vault.mp4` is missing, show the standard Section 6 placeholder full-bleed, with the headline still appearing on schedule.
+
+If a different headline is wanted instead of the one above, two alternates in the same register:
+- `This is the part that isn't a number.`
+- `Everything else was just the path here.`
+
+**Reduced motion:** a fully static composition, per the design system's requirement. No pin, no scroll-driven clip-path/overlay/headline animation — the mask sits fully open, the overlay rests at its open-state alpha, and the headline is fully visible. Unlike the normal-motion behaviour above, the background video does **not** keep playing here: `autoplay` and `loop` are turned off via JavaScript, the video is paused, and it's left on a single stable frame — a real static frame, not a looping one.
+
 ### 5.5 Screen 5 — What your reserve is doing right now
 
 Centered header (max-width 720px), then a horizontal 4-segment bar at full container width, then a 4-column row of labels, then a centered closing line. No media.
@@ -223,6 +257,46 @@ Bar: height 56px, `border-radius: 999px`, 1.5px border `--gr-line`, four segment
 | Closing line | `No hidden totals. No number that means two things at once.` | `--fs-small` | center |
 
 The four state names are product terminology. Do not rename them to `Available`, `Locked`, `Pending`, or anything else.
+
+### 5.5a Screen 5 — Reserve Detail Hologram (interactive popup)
+
+Screen 5 gets one addition: a small text link under the closing line opens a hologram-style detail panel — the same visual language Global Reserve uses inside the product — so a visitor can see, once, what the four states look like with numbers attached. It never opens on its own. It opens only when clicked, and it closes on Escape, on a click outside the card, or via its own close button.
+
+Every number inside the panel is a labelled example, not a live balance. The panel exists to demonstrate the interface, not to suggest the visitor already has an account. Follow the "for example" pattern already used in the Screen 2 stat line — every value here carries the same qualifier, spoken once at the top of the card and repeated in each figure's caption.
+
+New tokens for `/css/tokens.css`, used only by this panel:
+
+- `--gr-holo-bg`: `rgba(11, 18, 32, .72)` — backdrop behind the card
+- `--gr-holo-panel`: `#111A2D` — card fill
+- `--gr-holo-border`: `rgba(93, 169, 255, .55)` — 1px card border
+- `--gr-holo-glow`: `0 0 24px rgba(93,169,255,.35), 0 0 64px rgba(93,169,255,.15)` — card box-shadow
+- `--gr-holo-text`: `#F1F5FB` — card text
+- `--gr-holo-accent`: `var(--gr-accent)` — ring and figures reuse the site's existing gold, tying the panel back to the rest of the page
+
+This is the one place on the page that leaves the warm paper palette for a dark, glowing treatment — deliberately, so the panel reads as a window into the live product rather than another marketing block. Flag to design for review before build.
+
+| Element | Copy | Style | Position |
+|---|---|---|---|
+| Trigger | `View a live example` | `--fs-caption`, `--gr-ink-2`, underline on hover/focus | center, below the closing line |
+| Panel container | Full-viewport modal: dimmed backdrop (`--gr-holo-bg`) over the page, centered card. | Card: `--gr-holo-panel` fill, 1px `--gr-holo-border`, `--gr-holo-glow` shadow, `border-radius: 20px`, max-width 720px, padding 48px | center overlay |
+| Disclaimer | `For example — not your account.` | `--fs-caption`, `--gr-holo-text` at 70% opacity, top of card | center |
+| Center ring | `for example, 82% / Ready` | `--fs-stat` scaled to 56px, `--gr-holo-accent`; ring stroke 3px `--gr-holo-accent` on a 3px `rgba(255,255,255,.12)` track | center |
+| Card — Ready | `for example, $42,800 / Free to use today` | `--fs-item-title` value, `--fs-small` caption, `--gr-holo-text` | top-left |
+| Card — Reserved | `for example, $18,000 / Holding a home you already have` | same | top-right |
+| Card — Scheduled | `for example, 90 days / Arriving on its own timeline` | same | bottom-left |
+| Card — Committed | `for example, 78% / Toward a property you're working on` | same | bottom-right |
+| Connector glyphs | Three small decorative dots linking the ring to the cards. No labels. | 1px `--gr-holo-border` lines; `aria-hidden="true"` | decorative only |
+| Close control | `×` | icon button, `aria-label="Close"`, `--gr-holo-text` | top-right corner of card |
+
+Motion and accessibility for this panel:
+
+- Opens only on click of the trigger link — never on scroll, never on load, never automatically.
+- On open: card fades and scales in 300ms; the ring stroke draws in over 700ms ease-out. Under `prefers-reduced-motion: reduce`, both appear at final state with a single 150ms opacity fade and the ring is drawn complete, not animated.
+- `role="dialog"` `aria-modal="true"`, labelled by the ring's caption. Focus moves to the close button on open and returns to the trigger link on close.
+- Escape and a click on the backdrop both close the panel, same as the close button.
+- Implemented as `js/hologram.js`, exporting a single `initHologram(el)` function. No globals, no dependency on the Screen 5 reveal or bar logic.
+
+The four card labels (`Ready`, `Reserved`, `Scheduled`, `Committed`) are the same product terminology as the bar above — do not introduce different names for the same states inside the panel.
 
 ### 5.6 Screen 6 — The path to a home
 
@@ -328,6 +402,7 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | Slot | Screen | File | Format | Length | Behaviour |
 |---|---|---|---|---|---|
 | `--media-hero` | 1 | `media/hero-vault.mp4` | 1280x720 | 6s | Scroll-scrubbed. Already present as `video111.mp4`; re-encode with `ffmpeg -i video111.mp4 -g 1 -an media/hero-vault.mp4` |
+| `--media-reveal` | 4.5 | `media/reveal-vault.mp4` | 1280x720, 30fps | 6s, autoplaying loop | Plays continuously (`autoplay muted loop`), independent of scroll — scroll drives only the section's mask, overlay, and headline (Section 5.4a). Remuxed from the supplied aerial night clip via stream copy, no re-encode |
 | `--media-question` | 2 | `media/time-scale.mp4` | 1080x1080 | 4-6s | Plays once when the section reaches 40% of the viewport, then holds the last frame. May be generated instead — Section 7.1 |
 | `--media-red` | 3 | `media/red-object.webp` | 800x800, transparent | still | Static. Optional 8-10s loop if a video version is supplied |
 | `--media-counter` | 4 | `media/rewards-ticker.mp4` | 1920x200 | 8s | Loop. May be generated instead — Section 7.2 |
@@ -336,6 +411,8 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720 | 8-10s | Loop, muted, slowed |
 
 All videos: no audio track except Gia, `preload="metadata"`, `playsinline`, and `muted` before `autoplay`. Total page weight target under 12MB on desktop; on viewports under 768px, load poster images instead of the decorative videos on Screens 2, 4, and 10.
+
+Screen 4.5's video autoplays and loops independently of scroll, like the Screen 10 CTA video. It stays a real video at every viewport width and is sized to fit inside the existing 12MB budget alongside the other video slots above.
 
 ---
 
@@ -369,8 +446,8 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 ## 8. MOTION, ACCESSIBILITY, PERFORMANCE
 
 1. Scroll reveal for Screens 2-10: opacity `0 -> 1` and `translateY(24px -> 0)`, 600ms, `cubic-bezier(.22,.61,.36,1)`, triggered once at 25% visibility via `IntersectionObserver`. Nothing else animates on scroll.
-2. No parallax, no pinned sections other than Screen 1, no horizontal scroll, no scroll hijacking.
-3. `@media (prefers-reduced-motion: reduce)`: disable reveal, marquee, bubbles, and generated animations; show final frames; Screen 1 shows a single static frame with both text blocks visible.
+2. No parallax, no pinned sections other than Screen 1 and Screen 4.5, no horizontal scroll, no scroll hijacking.
+3. `@media (prefers-reduced-motion: reduce)`: disable reveal, marquee, bubbles, and generated animations; show final frames; Screen 1 shows a single static frame with its text visible. Screen 4.5 is fully static too: no pin, its clip-path/overlay/headline hold at their resting state without animating, and its background video has `autoplay`/`loop` turned off via JavaScript and is paused on a single stable frame (in normal motion, that same video plays continuously and is untouched by this rule).
 4. Semantic markup: one `<h1>` (Screen 1) and `<h2>` for every other screen. Buttons that navigate are `<a>`. Decorative media gets `aria-hidden="true"` and empty `alt`.
 5. Keyboard: visible focus ring, logical tab order, no positive `tabindex`.
 6. Contrast: all text meets WCAG AA. Over video, rely on the text shadow plus a `rgba(0,0,0,.25)` overlay if a measurement fails.
@@ -385,11 +462,14 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 Before reporting done, verify each item and state the result:
 
 - [ ] No Cyrillic character exists anywhere in the repository output. Verify with `grep -rPl "[\x{0400}-\x{04FF}]" --include=* .` over the files you created or edited, excluding the three original `.md` reference files.
-- [ ] All ten sections exist with correct ids and `data-screen` values.
+- [ ] All ten numbered screens plus the Screen 4.5 reveal exist with correct ids and `data-screen` values (eleven sections total).
 - [ ] Every string on the page matches Section 5 character for character.
 - [ ] Screen 1 still scrubs on scroll and its text coordinates are unchanged.
 - [ ] Missing media assets render the placeholder, and the page still lays out correctly.
 - [ ] Screens 4 and 8 contain no digits.
+- [ ] The Screen 5 hologram panel opens only on click, is fully keyboard-operable (focus trap, Escape, backdrop click), and every value inside it is explicitly labelled "for example."
+- [ ] In normal motion, Screen 4.5's video autoplays, loops, and is paused only while the section is fully out of view (`IntersectionObserver`); scroll drives only the clip-path reveal/contraction (no layout shift), overlay, and headline. Under `prefers-reduced-motion`, the mask/overlay/headline hold at rest and the video itself is paused on a single stable frame (`autoplay`/`loop` off via JavaScript) — a fully static composition.
+- [ ] Screen 1 and Screen 4.5 are the only two pinned sections on the page.
 - [ ] The Gia video element exists with `muted`, `loop`, `playsinline`, and a poster.
 - [ ] Layout is correct at 1920, 1440, 1024, 768, and 375 CSS pixels.
 - [ ] `prefers-reduced-motion` produces a fully static, readable page.
@@ -407,7 +487,7 @@ Use these in order. Each assumes this document is open in the workspace as `BUIL
 
 **A2 — Copy and layout, in batches**
 
-> Read BUILD-SPEC.md Section 5.2 to 5.5 and build Screens 2 through 5 completely: markup, copy verbatim, layout, responsive behaviour at the 768px breakpoint. Use the media placeholder from Section 6 for every media slot. English only.
+> Read BUILD-SPEC.md Section 5.2 to 5.5 and build Screens 2 through 5, including the Section 5.4a video reveal between them: markup, copy verbatim, layout, responsive behaviour at the 768px breakpoint. Use the media placeholder from Section 6 for every media slot. English only.
 
 > Now do the same for Sections 5.6 to 5.8, then 5.9 to 5.10.
 
@@ -434,6 +514,8 @@ These are product terms. Use exactly this spelling and capitalisation, and never
 `GLOBAL RESERVE®` · `Global Reserve` · `Glonari` · `RED` · `Real Estate Dollars` · `Gia` · `Ready` · `Committed` · `Reserved` · `Scheduled`
 
 Never introduce on this page: `GD`, `Glonari Dollars`, `Future RED`, `Global Dream`, `DBR`, `Experience Capacity`, tier names, percentages, yields, cost bases, or any specific balance figure. If a task seems to require one, stop and ask.
+
+Exception: inside the Screen 5.5a hologram panel only, illustrative example figures (dollar amounts, percentages, a day count) are permitted, each one explicitly marked "for example" per Section 5.5a. This does not lift the restriction anywhere else on the page — Screens 1–10 and their copy remain governed by the rule above.
 
 ---
 
@@ -467,3 +549,4 @@ Do not add: navigation bar, footer with links, cookie banner, language switcher,
 - Экран 6 — строка про сброс таймера должна остаться крупной и заметной.
 - Экран 7 — видео с Gia обязано быть на месте; если его подменили картинкой, экран теряет смысл.
 - Экраны 4 и 8 — ни одной цифры.
+- Экран 4.5 (новый) — обычное циклическое видео, которое играет независимо от скролла; скролл управляет только маской, затемнением и заголовком; проверить, что вес вписывается в общий бюджет страницы наравне с остальными видео.

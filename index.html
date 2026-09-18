@@ -141,6 +141,24 @@
     </div>
   </section>
 
+  <!-- Screen 4.5 — scroll-controlled video reveal (Section 5.4a) -->
+  <section id="screen-4-5" data-screen="reveal" class="section-performance">
+    <div class="reveal-wrapper">
+      <div class="reveal-sticky">
+        <div class="reveal-frame">
+          <video class="reveal-video" src="media/reveal-vault.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+          <div class="reveal-fallback" data-slot="--media-reveal" aria-hidden="true" hidden>
+            <p>Media pending — media/reveal-vault.mp4</p>
+          </div>
+          <div class="reveal-overlay" aria-hidden="true"></div>
+        </div>
+        <div class="reveal-text">
+          <h2 class="reveal-headline">This is what it's all for.</h2>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Screen 5 — What your reserve is doing right now -->
   <section id="screen-5" data-screen="states" hidden>
     <h2>Your reserve is never just sitting there.</h2>
@@ -173,6 +191,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="js/scrub.js"></script>
+  <script src="js/video-reveal.js"></script>
   <script src="js/timescale.js"></script>
   <script src="js/counter.js"></script>
 </body>
