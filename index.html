@@ -6,7 +6,7 @@
   <title>GLOBAL RESERVE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/screens.css">
@@ -208,7 +208,12 @@
     </div>
   </section>
 
-  <!-- Screen 5.5 — Reserve Hologram in the Vault (Section 5.5a) -->
+  <!-- Screen 5.5 — Reserve Hologram in the Vault (Section 5.5a)
+       Design-system exception: the internal panel below is a near-literal
+       transplant of references/reserve-hologram-panel-source/ (structure,
+       geometry, colors, Roboto type, and decorative assets) per the current
+       task's explicit, scoped exception in GLOBAL-RESERVE-DESIGN-SYSTEM.md.
+       Nothing outside this panel uses Roboto or these coordinates. -->
   <section id="screen-5-5" data-screen="reserve-demo">
     <div class="reserve-hologram__wrapper">
       <div class="reserve-hologram__sticky">
@@ -217,39 +222,95 @@
           <img class="reserve-hologram__bg-img" src="media/reserve-hologram-bg.webp" alt="" width="1920" height="1080" loading="lazy">
         </div>
 
-        <div class="reserve-hologram__scene">
-          <div class="reserve-hologram__rig">
+        <!-- Single 1920x1080 scene: background, panel, beam, and glow all
+             live in one coordinate space so they crop/scale together like
+             one "cover" image and stay pixel-locked to each other. -->
+        <div class="reserve-hologram__stage">
 
-            <div class="reserve-hologram__panel">
-              <svg class="reserve-hologram__panel-frame" viewBox="0 0 1119 599" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-                <defs>
-                  <radialGradient id="rh-panel-fill" gradientUnits="userSpaceOnUse" cx="560" cy="341.5" r="420">
-                    <stop offset="0" stop-color="rgba(3,40,78,0.86)"/>
-                    <stop offset="1" stop-color="rgba(2,16,36,0.93)"/>
-                  </radialGradient>
-                  <filter id="rh-panel-glow" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="5"/>
-                  </filter>
-                </defs>
-                <polygon class="reserve-hologram__panel-glow-shape" points="24,0 1095,0 1119,24 1119,575 1095,599 24,599 0,575 0,24" filter="url(#rh-panel-glow)"></polygon>
-                <polygon class="reserve-hologram__panel-fill-shape" points="24,0 1095,0 1119,24 1119,575 1095,599 24,599 0,575 0,24" fill="url(#rh-panel-fill)"></polygon>
-                <polygon class="reserve-hologram__panel-stroke-shape" points="24,0 1095,0 1119,24 1119,575 1095,599 24,599 0,575 0,24" fill="none"></polygon>
-              </svg>
+          <div class="reserve-hologram__beam" aria-hidden="true">
+            <svg class="reserve-hologram__beam-svg" viewBox="0 0 380 90" preserveAspectRatio="none" focusable="false">
+              <defs>
+                <linearGradient id="rh-beam-fill" x1="0" y1="0" x2="0" y2="90" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="rgba(130,192,250,0.32)"></stop>
+                  <stop offset="1" stop-color="rgba(226,240,255,0.7)"></stop>
+                </linearGradient>
+                <linearGradient id="rh-beam-core" x1="0" y1="0" x2="0" y2="90" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="rgba(226,240,255,0.12)"></stop>
+                  <stop offset="1" stop-color="rgba(255,255,255,0.9)"></stop>
+                </linearGradient>
+              </defs>
+              <polygon class="reserve-hologram__beam-cone" points="0,0 380,0 208,90 172,90" fill="url(#rh-beam-fill)"></polygon>
+              <polygon class="reserve-hologram__beam-core" points="150,0 230,0 198,90 182,90" fill="url(#rh-beam-core)"></polygon>
+              <line class="reserve-hologram__beam-edge" x1="0" y1="0" x2="172" y2="90"></line>
+              <line class="reserve-hologram__beam-edge" x1="380" y1="0" x2="208" y2="90"></line>
+            </svg>
+          </div>
 
-              <div class="reserve-hologram__panel-edge-glow" aria-hidden="true"></div>
+          <div class="reserve-hologram__base-glow" aria-hidden="true">
+            <div class="reserve-hologram__floor-glow"></div>
+            <div class="reserve-hologram__base-bloom"></div>
+          </div>
 
-              <div class="reserve-hologram__content">
+          <div class="reserve-hologram__panel">
 
-                <header class="reserve-hologram__header">
-                  <div class="reserve-hologram__header-lines" aria-hidden="true">
+            <div class="reserve-hologram__panel-bg" aria-hidden="true">
+              <div class="reserve-hologram__panel-bg-glow"></div>
+              <div class="reserve-hologram__panel-bg-gradient"></div>
+            </div>
+
+            <div class="reserve-hologram__panel-clip">
+              <div class="reserve-hologram__panel-container">
+
+                <header class="reserve-hologram__header-block">
+                  <div class="reserve-hologram__header-elements" aria-hidden="true">
                     <img src="media/reserve-hologram/header-lines.svg" alt="" class="reserve-hologram__header-lines-img">
                   </div>
-                  <p class="reserve-hologram__eyebrow">GLOBAL RESERVE®</p>
-                  <h2 class="reserve-hologram__heading">Your reserve at a glance</h2>
-                  <p class="reserve-hologram__disclaimer">Example interface — not your account.</p>
+                  <div class="reserve-hologram__header-inner">
+                    <p class="reserve-hologram__eyebrow">GLOBAL RESERVE®</p>
+                    <div class="reserve-hologram__header-text">
+                      <h2 class="reserve-hologram__heading">Your reserve at a glance</h2>
+                      <p class="reserve-hologram__disclaimer">Example interface — not your account.</p>
+                    </div>
+                  </div>
                 </header>
 
-                <div class="reserve-hologram__body">
+                <div class="reserve-hologram__general-section">
+
+                  <div class="reserve-hologram__left-states">
+                    <div class="reserve-hologram__stat" data-state="ready">
+                      <p class="reserve-hologram__stat-label">Ready</p>
+                      <p class="reserve-hologram__stat-value">$42,800</p>
+                      <p class="reserve-hologram__stat-caption">Free to use today</p>
+                    </div>
+                    <div class="reserve-hologram__stat" data-state="scheduled">
+                      <p class="reserve-hologram__stat-label">Scheduled</p>
+                      <p class="reserve-hologram__stat-value">90 days</p>
+                      <p class="reserve-hologram__stat-caption">Arriving on its own timeline</p>
+                    </div>
+                  </div>
+
+                  <div class="reserve-hologram__ring">
+                    <div class="reserve-hologram__ring-circle" aria-hidden="true">
+                      <img src="media/reserve-hologram/progress-ring.svg" alt="" class="reserve-hologram__ring-img">
+                    </div>
+                    <div class="reserve-hologram__ring-text">
+                      <p class="reserve-hologram__ring-percent">82%</p>
+                      <p class="reserve-hologram__ring-label">Ready</p>
+                    </div>
+                  </div>
+
+                  <div class="reserve-hologram__right-states">
+                    <div class="reserve-hologram__stat" data-state="reserved">
+                      <p class="reserve-hologram__stat-label">Reserved</p>
+                      <p class="reserve-hologram__stat-value">$18,000</p>
+                      <p class="reserve-hologram__stat-caption">Holding a home you already have</p>
+                    </div>
+                    <div class="reserve-hologram__stat" data-state="committed">
+                      <p class="reserve-hologram__stat-label">Committed</p>
+                      <p class="reserve-hologram__stat-value">78%</p>
+                      <p class="reserve-hologram__stat-caption reserve-hologram__stat-caption--narrow">Toward a property you're<br>working on</p>
+                    </div>
+                  </div>
 
                   <div class="reserve-hologram__divider reserve-hologram__divider--left" aria-hidden="true">
                     <img src="media/reserve-hologram/divider-lines.svg" alt="" class="reserve-hologram__divider-img">
@@ -258,82 +319,17 @@
                     <img src="media/reserve-hologram/divider-lines.svg" alt="" class="reserve-hologram__divider-img">
                   </div>
 
-                  <div class="reserve-hologram__ring">
-                    <svg class="reserve-hologram__ring-svg" viewBox="0 0 332 332" aria-hidden="true" focusable="false">
-                      <defs>
-                        <filter id="rh-ring-outer-glow" x="-60%" y="-60%" width="220%" height="220%">
-                          <feGaussianBlur stdDeviation="3.2"></feGaussianBlur>
-                        </filter>
-                      </defs>
-                      <circle class="reserve-hologram__ring-outer-glow" cx="166" cy="166" r="158" filter="url(#rh-ring-outer-glow)"></circle>
-                      <circle class="reserve-hologram__ring-outer" cx="166" cy="166" r="158"></circle>
-                      <circle class="reserve-hologram__ring-disc" cx="166" cy="166" r="143"></circle>
-                      <circle class="reserve-hologram__ring-ticks" cx="166" cy="166" r="127"></circle>
-                      <circle class="reserve-hologram__ring-track" cx="166" cy="166" r="112"></circle>
-                      <circle class="reserve-hologram__ring-progress" cx="166" cy="166" r="112"></circle>
-                    </svg>
-                    <div class="reserve-hologram__ring-text">
-                      <p class="reserve-hologram__ring-percent">82%</p>
-                      <p class="reserve-hologram__ring-label">Ready</p>
-                    </div>
-                  </div>
-
-                  <div class="reserve-hologram__stat" data-state="ready">
-                    <p class="reserve-hologram__stat-label">Ready</p>
-                    <p class="reserve-hologram__stat-value">$42,800</p>
-                    <p class="reserve-hologram__stat-caption">Free to use today</p>
-                  </div>
-
-                  <div class="reserve-hologram__stat" data-state="reserved">
-                    <p class="reserve-hologram__stat-label">Reserved</p>
-                    <p class="reserve-hologram__stat-value">$18,000</p>
-                    <p class="reserve-hologram__stat-caption">Holding a home you already have</p>
-                  </div>
-
-                  <div class="reserve-hologram__stat" data-state="scheduled">
-                    <p class="reserve-hologram__stat-label">Scheduled</p>
-                    <p class="reserve-hologram__stat-value">90 days</p>
-                    <p class="reserve-hologram__stat-caption">Arriving on its own timeline</p>
-                  </div>
-
-                  <div class="reserve-hologram__stat" data-state="committed">
-                    <p class="reserve-hologram__stat-label">Committed</p>
-                    <p class="reserve-hologram__stat-value">78%</p>
-                    <p class="reserve-hologram__stat-caption">Toward a property you're working on</p>
-                  </div>
-
                 </div>
 
-                <div class="reserve-hologram__footer-accent" aria-hidden="true"></div>
+                <footer class="reserve-hologram__footer">
+                  <p class="reserve-hologram__footer-text">Explore the example</p>
+                  <img src="media/reserve-hologram/footer-underline.svg" alt="" class="reserve-hologram__footer-underline-img">
+                </footer>
 
               </div>
             </div>
-
-            <div class="reserve-hologram__beam" aria-hidden="true">
-              <svg class="reserve-hologram__beam-svg" viewBox="0 0 400 240" preserveAspectRatio="none" focusable="false">
-                <defs>
-                  <linearGradient id="rh-beam-fill" x1="0" y1="240" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="rgba(130,192,250,0.42)"></stop>
-                    <stop offset="1" stop-color="rgba(130,192,250,0)"></stop>
-                  </linearGradient>
-                  <linearGradient id="rh-beam-core" x1="0" y1="240" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="rgba(226,240,255,0.85)"></stop>
-                    <stop offset="1" stop-color="rgba(226,240,255,0)"></stop>
-                  </linearGradient>
-                </defs>
-                <polygon class="reserve-hologram__beam-cone" points="150,0 250,0 400,240 0,240" fill="url(#rh-beam-fill)"></polygon>
-                <polygon class="reserve-hologram__beam-core" points="182,0 218,0 234,240 166,240" fill="url(#rh-beam-core)"></polygon>
-                <line class="reserve-hologram__beam-edge" x1="150" y1="0" x2="0" y2="240"></line>
-                <line class="reserve-hologram__beam-edge" x1="250" y1="0" x2="400" y2="240"></line>
-              </svg>
-            </div>
-
-            <div class="reserve-hologram__base-glow" aria-hidden="true">
-              <div class="reserve-hologram__floor-glow"></div>
-              <div class="reserve-hologram__base-bloom"></div>
-            </div>
-
           </div>
+
         </div>
 
       </div>

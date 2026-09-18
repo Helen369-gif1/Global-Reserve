@@ -401,3 +401,7 @@ Start every future implementation prompt with:
 > Read `GLOBAL-RESERVE-BUILD-SPEC.md` and `GLOBAL-RESERVE-DESIGN-SYSTEM.md` before changing files. The build spec controls approved copy, section order, product terminology, semantics, and functionality. The design system controls visual styling, typography, colors, spacing, grids, section rhythm, and responsive behavior. If their visual instructions conflict, follow the design system. Do not change previously approved screens unless this prompt explicitly authorizes it.
 
 Then specify exactly one screen or one bounded system task.
+
+## 14. Screen 5.5 exception
+
+> Screen 5.5 exception: the internal hologram interface uses the supplied Figma-derived panel implementation as its visual source of truth, including Roboto 400/500/600, its original type scale, colors, geometry, decorative SVG assets, and internal spacing. This exception applies only inside the Screen 5.5 hologram panel. The surrounding site and all other screens continue to use the standard Global Reserve design system.

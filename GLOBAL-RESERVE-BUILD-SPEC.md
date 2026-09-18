@@ -264,22 +264,21 @@ The four state names are product terminology. Do not rename them to `Available`,
 
 This is a new independent section inserted between Screen 5 and Screen 6. It replaces the former click-open modal. The visitor first reads the calm explanation of the four states on Screen 5, then scrolls into a full-viewport vault scene where the example product interface assembles automatically. The complete interface must be visible without a click.
 
-This is not one pre-rendered video. Use a clean vault image as the background and build the projection, SVG ring, labels, and values as HTML/CSS/SVG so the copy remains sharp, editable, accessible, responsive, and reversible on scroll. The supplied concept image is a composition reference only and must not be inserted as the finished interface.
+This is not one pre-rendered video. `references/reserve-hologram-panel-source/` is the visual and geometric source of truth for the panel: its exact HTML structure, CSS geometry (the 1920×1080 scene and every element's coordinates within it), Roboto type scale, colors, and decorative SVG assets are transplanted into production nearly verbatim — see the Screen 5.5 exception in `GLOBAL-RESERVE-DESIGN-SYSTEM.md`. The supplied concept image (`references/Screen_5_5_Reference.png`) is a composition reference for the same result. Labels and values remain real HTML/CSS/SVG (not baked into a raster image) so the copy stays sharp, editable, accessible, responsive, and reversible on scroll.
 
 **Section structure and asset:**
 
 - Section: `id="screen-5-5"`, `data-screen="reserve-demo"`, height `420vh`.
 - Inner stage: `position: sticky; top: 0; height: 100vh; overflow: hidden`.
 - Background: `media/reserve-hologram-bg.webp`, 1920x1080, clean vault scene with no interface or text, rendered full-bleed with `object-fit: cover`.
-- The small bronze projector base may be baked into the background. Its beam and glow are separate decorative CSS elements with `aria-hidden="true"`.
-- Projection plane: one unified wide translucent dark-navy surface, not four detached floating cards; desktop maximum approximately `1100px × 620px`, with the warm vault architecture remaining visible around it.
+- The bronze projector base is baked into the background at approximately `(960, 895)` on the 1920×1080 frame. The beam and glow are separate decorative elements with `aria-hidden="true"`, positioned in the same 1920×1080 coordinate space as the panel so they stay pixel-locked to both the panel and the baked-in base at every viewport size.
+- Panel: exact source geometry, `left: 400px; top: 206px; width: 1119px; height: 599px` on the 1920×1080 frame — not four detached floating cards.
 
 **Visual treatment:**
 
-- Restrained transparent dark-navy plane, thin electric-blue structural lines, white primary text, muted cool-gray secondary text, and bronze-gold key figures.
-- Blue is a technical accent, not the dominant colour. Keep glow narrow and low-opacity so the scene stays calm, precise, and premium.
-- No thick neon borders, gaming HUD styling, excessive connector lines, large cyan bloom, modal backdrop, close control, glassmorphism blur, or four separate glowing cards.
-- The central ring is SVG. Use a muted track and a bronze-gold progress stroke ending at 82%.
+- Per the Screen 5.5 design-system exception: the panel's colors, borders, glow, and gradient background come from the source assets as-is (border `#82C0FA`, eyebrow/key-figure gold `#F7C37B`/`#F8C47B`, secondary text `#8DA3B9`, white primary text, inner disc `#09213E`).
+- No modal backdrop, close control, or four separate glowing cards.
+- The central ring uses the source `progress-ring.svg` (muted disc, outer glow, bronze-gold arc baked at 82%) — not a redrawn or substitute ring.
 
 **Exact interface copy:**
 
@@ -293,8 +292,9 @@ This is not one pre-rendered video. Use a clean vault image as the background an
 | Reserved | `$18,000` / `Holding a home you already have` | top-right |
 | Scheduled | `90 days` / `Arriving on its own timeline` | bottom-left |
 | Committed | `78%` / `Toward a property you're working on` | bottom-right |
+| Footer | `Explore the example` | bottom centre of the panel, under the source underline graphic |
 
-The four state names are locked product terminology: `Ready`, `Committed`, `Reserved`, `Scheduled`. Do not replace them with `Available`, `Locked`, `Pending`, `Future Unlocks`, `Qualification Progress`, or any other label. The disclaimer qualifies every figure in this section as an example; do not repeat "for example" inside every state summary.
+The four state names are locked product terminology: `Ready`, `Committed`, `Reserved`, `Scheduled`. Do not replace them with `Available`, `Locked`, `Pending`, `Future Unlocks`, `Qualification Progress`, or any other label. The disclaimer qualifies every figure in this section as an example; do not repeat "for example" inside every state summary. The footer line is plain text — not a link or button — unless a later prompt supplies an approved destination.
 
 **Scroll sequence:**
 
@@ -303,14 +303,15 @@ Use the current project's existing GSAP/scroll-progress setup; do not add anothe
 | Progress | State |
 |---:|---|
 | `0.00–0.10` | Vault only; no projection |
-| `0.10–0.24` | Projector glow and projection beam appear |
-| `0.18–0.44` | The unified projection plane gradually builds from the base |
+| `0.10–0.24` | Projector glow and the projection beam appear |
+| `0.18–0.40` | The original background and panel frame build in |
 | `0.30–0.50` | Eyebrow, heading, disclaimer, and decorative lines reveal |
-| `0.40–0.64` | SVG ring draws to 82%; `82%` and `Ready` reveal |
-| `0.52–0.78` | State summaries reveal in this order: Ready, Reserved, Scheduled, Committed |
-| `0.78–1.00` | Full composition holds, fully visible and readable — no exit fade |
+| `0.40–0.60` | Source progress ring reveals (conic sweep); `82%` and `Ready` follow |
+| `0.58–0.82` | State summaries reveal in this order: Ready, Reserved, Scheduled, Committed |
+| `0.78–0.86` | `Explore the example` and its underline reveal, last |
+| `0.86–1.00` | Full composition holds, fully visible and readable — no exit fade |
 
-There is no exit phase: the panel, beam, glow, and all text remain fully visible for the rest of the runway once assembled. The section only leaves the viewport because the sticky pin ends, not because anything fades out. Each state summary uses only a small `translateY(12px -> 0)` plus opacity. Do not animate layout dimensions or add parallax. The vault background remains visually stable while the projection assembles.
+There is no exit phase: the panel, beam, glow, and all text remain fully visible for the rest of the runway once assembled. The section only leaves the viewport because the sticky pin ends, not because anything fades out. Each state summary uses only a small `translateY` plus opacity. Do not animate layout dimensions or add parallax. The vault background remains visually stable while the projection assembles.
 
 **Implementation and isolation:**
 
@@ -322,9 +323,9 @@ There is no exit phase: the panel, beam, glow, and all text remain fully visible
 
 **Responsive and reduced motion:**
 
-- Desktop: central ring with a two-by-two arrangement of state summaries.
-- At `768px` and below: ring above the summaries; summaries become one vertical list; no horizontal scrolling; all copy remains readable.
-- Under `prefers-reduced-motion: reduce`: remove the pin and all scroll animation, show one complete static composition with the ring and all four summaries visible, and preserve the disclaimer.
+- Desktop (above `960px`): the exact 1920×1080 panel geometry, scaled as one unit with the background using a `cover` formula so the panel, beam, and baked-in projector base stay pixel-locked together.
+- At `960px` and below: a separate adaptive layout (not a scaled-down copy of the desktop stage) — ring above the summaries, two columns down to `600px`, one column below it, in the order Ready, Reserved, Scheduled, Committed; no horizontal scrolling; all copy remains readable in Roboto at reduced sizes.
+- Under `prefers-reduced-motion: reduce`: remove the pin and all scroll animation, show one complete static composition with the ring (fully revealed) and all four summaries visible, and preserve the disclaimer and the footer line.
 
 ### 5.6 Screen 6 — The path to a home
 
