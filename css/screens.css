@@ -607,3 +607,191 @@
     opacity: 1;
   }
 }
+
+/* ── Screen 5 — What your reserve is doing right now ──
+   Dark composition matching Screens 2-4: centered header, one full-width
+   four-segment state bar, four aligned descriptions below it, centered
+   closing line. Segment fills step from a restrained bronze whisper on
+   "Ready" down through surface tones to transparent on "Scheduled" — no
+   bright multicolour fills. The bar itself is aria-hidden since the
+   column titles below already carry the same four labels accessibly. */
+
+#screen-5 {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+  padding-block: clamp(96px, 11vw, 160px);
+}
+
+#screen-5 .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.screen-states__container {
+  width: 100%;
+}
+
+.screen-states__header {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.screen-states__heading {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+}
+
+.screen-states__body {
+  margin-top: 24px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+}
+
+.state-bar {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr .9fr .6fr;
+  align-items: stretch;
+  height: 56px;
+  margin-top: 80px;
+  border: 1.5px solid var(--gr-glass-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.state-bar__segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100%;
+  padding-inline: 12px;
+  border-right: 1.5px solid var(--gr-glass-line);
+  opacity: 0.85;
+  transition: opacity 0.25s ease;
+}
+
+.state-bar__segment:last-child {
+  border-right: none;
+}
+
+.state-bar__segment:hover {
+  opacity: 1;
+}
+
+.state-bar__segment--ready {
+  background: rgba(205, 127, 50, 0.07);
+}
+
+.state-bar__segment--committed {
+  background: var(--gr-surface);
+}
+
+.state-bar__segment--reserved {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.state-bar__segment--scheduled {
+  background: transparent;
+}
+
+.state-bar__label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--gr-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.screen-states__columns {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr .9fr .6fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.screen-states__column {
+  min-width: 0;
+  text-align: left;
+}
+
+.screen-states__column-title {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--gr-text-primary);
+}
+
+.screen-states__column-text {
+  margin-top: 8px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+}
+
+.screen-states__closing {
+  max-width: 720px;
+  margin-inline: auto;
+  margin-top: 48px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  #screen-5 {
+    padding-block: clamp(72px, 9vw, 96px);
+  }
+
+  #screen-5 .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .state-bar {
+    grid-template-columns: 1fr;
+    height: auto;
+    border-radius: 28px;
+    margin-top: 56px;
+  }
+
+  .state-bar__segment {
+    height: 56px;
+    border-right: none;
+    border-bottom: 1.5px solid var(--gr-glass-line);
+    justify-content: flex-start;
+  }
+
+  .state-bar__segment:last-child {
+    border-bottom: none;
+  }
+
+  .screen-states__columns {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-bar__segment {
+    transition: none;
+  }
+}

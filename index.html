@@ -160,8 +160,51 @@
   </section>
 
   <!-- Screen 5 — What your reserve is doing right now -->
-  <section id="screen-5" data-screen="states" hidden>
-    <h2>Your reserve is never just sitting there.</h2>
+  <section id="screen-5" data-screen="states">
+    <div class="container screen-states__container">
+
+      <div class="screen-states__header">
+        <h2 class="screen-states__heading">Your reserve is never just sitting there.</h2>
+        <p class="screen-states__body">At any moment, part of what you hold is free, part is set aside for a home you're working toward, and part is holding a home you already have. Global Reserve labels every piece, all the time, so you always know what you can use and what's already spoken for.</p>
+      </div>
+
+      <div class="state-bar" aria-hidden="true">
+        <div class="state-bar__segment state-bar__segment--ready">
+          <span class="state-bar__label">Ready</span>
+        </div>
+        <div class="state-bar__segment state-bar__segment--committed">
+          <span class="state-bar__label">Committed</span>
+        </div>
+        <div class="state-bar__segment state-bar__segment--reserved">
+          <span class="state-bar__label">Reserved</span>
+        </div>
+        <div class="state-bar__segment state-bar__segment--scheduled">
+          <span class="state-bar__label">Scheduled</span>
+        </div>
+      </div>
+
+      <div class="screen-states__columns">
+        <div class="screen-states__column">
+          <p class="screen-states__column-title">Ready</p>
+          <p class="screen-states__column-text">Free to cover your housing or grow your position.</p>
+        </div>
+        <div class="screen-states__column">
+          <p class="screen-states__column-title">Committed</p>
+          <p class="screen-states__column-text">Held while you work toward a property.</p>
+        </div>
+        <div class="screen-states__column">
+          <p class="screen-states__column-title">Reserved</p>
+          <p class="screen-states__column-text">Holding a home that's already yours.</p>
+        </div>
+        <div class="screen-states__column">
+          <p class="screen-states__column-title">Scheduled</p>
+          <p class="screen-states__column-text">Arriving later, managed for you.</p>
+        </div>
+      </div>
+
+      <p class="screen-states__closing">No hidden totals. No number that means two things at once.</p>
+
+    </div>
   </section>
 
   <!-- Screen 6 — The path to a home -->
