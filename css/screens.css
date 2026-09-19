@@ -1384,3 +1384,186 @@
     padding-inline: 24px;
   }
 }
+
+/* ── Screen 10 — CTA ──
+   Full-bleed video-background section. The section itself owns the
+   stacking context (isolation: isolate) and the dark fallback color,
+   so the video/overlay/content layers below never bleed into or
+   interact with any earlier screen's stacking. */
+
+#screen-10 {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+  padding-block: clamp(96px, 11vw, 160px);
+}
+
+.screen-cta__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+/* Single overlay, layered gradients: darkest behind the centered copy,
+   slightly lighter through the main image, darker again toward the
+   edges — a controlled vignette rather than a flat wash, per the
+   current task's readability target. Built only from --gr-void so the
+   vault's warm bronze character survives underneath it. */
+.screen-cta__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at center,
+      rgba(5, 5, 8, 0.67) 0%,
+      rgba(5, 5, 8, 0.56) 42%,
+      rgba(5, 5, 8, 0.56) 72%,
+      rgba(5, 5, 8, 0.62) 100%);
+}
+
+.screen-cta__container {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+  text-align: center;
+}
+
+.screen-cta__heading {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.screen-cta__body {
+  max-width: 700px;
+  margin: 24px auto 0;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.screen-cta__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.screen-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 40px;
+  border-radius: 999px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s, border-color 0.2s, background-color 0.2s, transform 0.2s;
+}
+
+.screen-cta__btn--primary {
+  background: var(--gr-text-primary);
+  color: var(--gr-ink);
+  border: 1.5px solid var(--gr-text-primary);
+}
+
+.screen-cta__btn--primary:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}
+
+.screen-cta__btn--secondary {
+  background: transparent;
+  color: var(--gr-text-primary);
+  border: 1.5px solid var(--gr-bronze);
+}
+
+.screen-cta__btn--secondary:hover {
+  background: var(--gr-bronze-subtle);
+  border-color: var(--gr-bronze);
+  transform: translateY(-2px);
+}
+
+.screen-cta__btn:focus-visible {
+  outline: 2px solid var(--gr-bronze);
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  #screen-10 {
+    padding-block: clamp(72px, 8vw, 96px);
+  }
+
+  .screen-cta__container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .screen-cta__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .screen-cta__btn {
+    width: 100%;
+  }
+}
+
+/* Below 768px, the moving video is replaced by the poster as a static
+   full-bleed background, per the current task's mobile media fallback —
+   independent of motion preference. */
+@media (max-width: 767px) {
+  .screen-cta__video {
+    display: none;
+  }
+
+  #screen-10 {
+    background-image: url('../media/cta-vault-poster.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-cta__video {
+    display: none;
+  }
+
+  #screen-10 {
+    background-image: url('../media/cta-vault-poster.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .screen-cta__btn {
+    transition: none;
+  }
+
+  .screen-cta__btn--primary:hover,
+  .screen-cta__btn--secondary:hover {
+    transform: none;
+  }
+}

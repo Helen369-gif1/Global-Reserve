@@ -469,8 +469,18 @@
   </section>
 
   <!-- Screen 10 — CTA -->
-  <section id="screen-10" data-screen="cta" hidden>
-    <h2>You don't need a plan yet.<br>You just need to see where you stand.</h2>
+  <section id="screen-10" data-screen="cta">
+    <video class="screen-cta__video" src="media/cta-vault.mp4" autoplay muted loop playsinline preload="metadata" poster="media/cta-vault-poster.jpg" aria-hidden="true" tabindex="-1"></video>
+    <div class="screen-cta__overlay" aria-hidden="true"></div>
+
+    <div class="container screen-cta__container">
+      <h2 class="screen-cta__heading">You don't need a plan yet.<br>You just need to see where you stand.</h2>
+      <p class="screen-cta__body">Open Global Reserve and you'll see how long you're covered, what's already working for you, and what the next step looks like — with Gia already watching the parts you'd rather not think about.</p>
+      <div class="screen-cta__actions">
+        <a class="screen-cta__btn screen-cta__btn--primary" href="#">Open Your Reserve</a>
+        <a class="screen-cta__btn screen-cta__btn--secondary" href="#">Talk to Gia First</a>
+      </div>
+    </div>
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

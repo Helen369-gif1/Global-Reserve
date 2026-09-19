@@ -429,7 +429,7 @@ Media slot: `--media-cta`.
 | Button 1 | `Open Your Reserve` | primary | center |
 | Button 2 | `Talk to Gia First` | secondary | center, beside button 1 |
 
-This video autoplays and loops normally. It is not scroll-scrubbed. Both buttons are required; do not drop the secondary one.
+This video autoplays and loops normally at natural playback speed. It is not scroll-scrubbed. Both buttons are required; do not drop the secondary one. Under `prefers-reduced-motion: reduce`, and on viewports below 768px, the moving video is replaced by its poster frame (`media/cta-vault-poster.jpg`) as a static full-bleed background.
 
 ---
 
@@ -447,7 +447,7 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | `--media-reserve-demo` | 5.5 | `media/reserve-hologram-bg.webp` | 1920x1080 | still | Clean vault background only; hologram interface is built in HTML/CSS/SVG and controlled by scroll |
 | `--media-home` | 6 | `media/home.png` | 1254x1254 source, cropped to 4:5 | still | Static photograph, displayed in a 4:5 cropped media frame |
 | `--media-gia` | 7 | `media/gia.mp4` | 1288x1610, 4:5 | ~5.04s | No `autoplay`, no loop. Muted, `playsinline`, poster `media/gia-poster.jpg`. Plays once per visit when ~30% visible (`IntersectionObserver`), holds last frame, resets only after fully leaving Screen 7. No mute/unmute button, no controls, no captions track |
-| `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720 | 8-10s | Loop, muted, slowed |
+| `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720, H.264, 30fps | ~6.01s, ~2.42MB | Autoplaying, muted, looping background at natural playback speed. Not scroll-scrubbed. Poster `media/cta-vault-poster.jpg` shown under `prefers-reduced-motion: reduce` and below 768px |
 
 All videos: no audio track except Gia, `preload="metadata"`, `playsinline`, and `muted` before `autoplay`. Total page weight target under 12MB on desktop; on viewports under 768px, load poster images instead of the decorative videos on Screens 2, 4, and 10.
 
