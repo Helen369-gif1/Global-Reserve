@@ -795,3 +795,191 @@
     transition: none;
   }
 }
+
+/* ── Screen 6 — The path to a home ──
+   Dark composition matching Screens 2-5: 50/50 split (photo left, text
+   right), a full-width static four-step stepper below both columns, then
+   the highlighted note line. No progress fill, no numbers in the markers —
+   the stepper is purely a static process illustration. */
+
+#screen-6 {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+  padding-block: clamp(96px, 11vw, 160px);
+}
+
+#screen-6 .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.screen-path__container {
+  width: 100%;
+}
+
+.screen-path__split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 96px;
+}
+
+.screen-path__media {
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.screen-path__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 44% center;
+  border-radius: 8px;
+}
+
+.screen-path__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-path__heading {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+}
+
+.screen-path__body {
+  margin-top: 24px;
+  max-width: 560px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+}
+
+.screen-path__stepper {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 96px;
+  padding: 0;
+  list-style: none;
+}
+
+.screen-path__stepper::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  height: 1.5px;
+  background: var(--gr-glass-line);
+}
+
+.screen-path__step {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-right: 32px;
+}
+
+.screen-path__step:last-child {
+  padding-right: 0;
+}
+
+.screen-path__step-marker {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gr-bronze);
+}
+
+.screen-path__step-label {
+  margin-top: 32px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+}
+
+.screen-path__note {
+  margin-top: 48px;
+  padding-left: 12px;
+  border-left: 2px solid var(--gr-bronze);
+  max-width: 720px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .screen-path__split {
+    gap: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  #screen-6 {
+    padding-block: clamp(72px, 9vw, 96px);
+  }
+
+  #screen-6 .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .screen-path__split {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .screen-path__media {
+    order: -1;
+  }
+
+  .screen-path__stepper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    margin-top: 56px;
+  }
+
+  .screen-path__stepper::before {
+    left: 7px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    height: auto;
+    background: var(--gr-glass-line);
+  }
+
+  .screen-path__step {
+    flex-direction: row;
+    align-items: flex-start;
+    padding-right: 0;
+  }
+
+  .screen-path__step-label {
+    margin-top: 0;
+    margin-left: 20px;
+  }
+}

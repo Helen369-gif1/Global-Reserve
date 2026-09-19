@@ -436,7 +436,7 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | `--media-red` | 3 | `media/red-object.webp` | 800x800, transparent | still | Static. Optional 8-10s loop if a video version is supplied |
 | `--media-counter` | 4 | `media/rewards-ticker.mp4` | 1920x200 | 8s | Loop. May be generated instead — Section 7.2 |
 | `--media-reserve-demo` | 5.5 | `media/reserve-hologram-bg.webp` | 1920x1080 | still | Clean vault background only; hologram interface is built in HTML/CSS/SVG and controlled by scroll |
-| `--media-home` | 6 | `media/home.jpg` | 1200x1400, 4:5 | still | Static photograph |
+| `--media-home` | 6 | `media/home.png` | 1254x1254 source, cropped to 4:5 | still | Static photograph, displayed in a 4:5 cropped media frame |
 | `--media-gia` | 7 | `media/gia.mp4` | 1080x1350, 4:5 | 12-18s | Loop, muted, `playsinline`, poster `media/gia-poster.jpg` |
 | `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720 | 8-10s | Loop, muted, slowed |
 
