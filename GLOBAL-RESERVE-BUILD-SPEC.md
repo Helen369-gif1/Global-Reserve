@@ -70,6 +70,10 @@ Rules for the existing code:
 /media/                   All video and image assets
 /media/reveal-vault.mp4   Screen 4.5 background video, supplied directly as the final asset for this slot (see Section 5.4a)
 /media/reserve-hologram-bg.webp  Screen 5.5 clean vault background, without interface or text
+/css/site-shell.css       Global fixed header, mobile menu, registration/login dialogs, footer (see Section 5.11)
+/js/site-shell.js         Mobile navigation, registration dialog, login dialog, placeholder-link prevention. Does not read from or depend on js/scrub.js or any other screen-specific script (see Section 5.11)
+/media/logo/gr-emblem.png       Approved square emblem mark, transparent, 245x245
+/media/logo/gr-full-lockup.png  Approved wide lockup with tagline, transparent, 967x245
 ```
 
 - Vanilla HTML/CSS/JS. No npm, no bundler, no TypeScript, no Tailwind, no React.
@@ -165,6 +169,8 @@ Timing, unchanged from `global_reserve_timecoding.md`:
 - Buttons belong to block 2 and fade with it, but must be clickable whenever they are visible.
 
 No balances, no numbers anywhere on this screen.
+
+A static dark overlay, `rgba(0, 0, 0, 0.24)`, sits above the video and below the text (`.video-container::after`) to improve the readability of both text blocks. It is a constant, non-animated layer — it does not change opacity with scroll or reduced motion.
 
 ### 5.2 Screen 2 — The Question
 
@@ -431,6 +437,58 @@ Media slot: `--media-cta`.
 
 This video autoplays and loops normally at natural playback speed. It is not scroll-scrubbed. Both buttons are required; do not drop the secondary one. Under `prefers-reduced-motion: reduce`, and on viewports below 768px, the moving video is replaced by its poster frame (`media/cta-vault-poster.jpg`) as a static full-bleed background.
 
+### 5.11 Global site shell — header, footer, registration and login dialogs
+
+Approved exception to Appendix C (see Appendix C). Adds one global fixed header, one global footer, one registration dialog, and one login dialog. Implemented in `css/site-shell.css` and `js/site-shell.js`. Does not modify Screen 1-10 content, copy, or behaviour.
+
+**Header** — `<header class="site-header">`, `position: fixed`, 72px tall desktop / 64px tall mobile, solid background (`--gr-void`), 1px bottom hairline (`--gr-glass-line`), no gradients/blur/shadow. Overlays Screen 1; Screen 1 receives no added padding or margin. Anchor-scroll offset: ~80px desktop, ~72px mobile.
+
+Brand lockup (left): link to `#screen-1`, containing `media/logo/gr-emblem.png` (decorative, `alt=""`, 40x40 desktop / 32x32 mobile) plus the live text `GLOBAL RESERVE®` in Playfair Display 700 (~21px desktop / ~17px mobile, letter-spacing ~0.02em), color `var(--gr-bronze)` — the only approved Playfair Display use outside Screen 1. Accessible name of the link: "GLOBAL RESERVE®".
+
+Primary navigation (`<nav aria-label="Primary navigation">`), IBM Plex Sans:
+
+| Label | Destination |
+|---|---|
+| Overview | `#screen-2` |
+| RED | `#screen-3` |
+| Rewards | `#screen-4` |
+| Reserve | `#screen-5-5` |
+| Gia | `#screen-7` |
+
+Header actions: two `<button type="button">` elements, `Log in` (transparent, 1px `--gr-glass-line` border) and `Register` (filled `--gr-bronze`, dark text, 8px radius, no gradient/glow/shadow). Both open their respective dialog.
+
+**Breakpoint: 1100px.** Above it, the desktop nav and actions are visible. At 1100px and below, they hide behind a hamburger button (`aria-label="Open menu"`/`"Close menu"`, `aria-expanded`, `aria-controls`) that reveals a solid dark mobile menu containing all five nav links plus Log in and Register. The menu closes on link selection, on Escape (returning focus to the hamburger), and on outside click. No third-party icon library; the hamburger is built from CSS lines.
+
+**Registration dialog** — native `<dialog id="register-dialog">`. Heading `Create your account`. Fields: Full name (`text`, required, `autocomplete="name"`), Email (`email`, required, `autocomplete="email"`), Password (`password`, required, `minlength="8"`, `autocomplete="new-password"`), Confirm password (same, plus mismatch validation). Checkbox: `I agree to the Terms and Privacy Policy` (required; `Terms` and `Privacy Policy` are placeholder links, `href="#"`, class `placeholder-link`, destinations TODO). Submit button: `Create Account`. On mismatched passwords, shows the inline error `Passwords do not match.`, cleared once corrected. On successful validation: no network request, no account created, nothing stored (no cookies/localStorage/sessionStorage/URL params), and the inline success message `Form validated successfully. No account has been created.` is shown. Close button accessible name: `Close registration dialog`. `// TODO: wire up real registration endpoint` marks the client-only handler in `js/site-shell.js`.
+
+**Login dialog** — native `<dialog id="login-dialog">`. Heading `Log in`. Fields: Email (`email`, required, `autocomplete="email"`), Password (`password`, required, `autocomplete="current-password"`). Submit button: `Log in`. On submit: no network request, nothing stored, inline result `Demo only. Sign-in is not connected yet.` is shown. Close button accessible name: `Close login dialog`. `// TODO: wire up real authentication endpoint` marks the client-only handler in `js/site-shell.js`.
+
+Both dialogs: `aria-labelledby`, focus the first field on open, close on Escape/backdrop click/close button, reset validation/result state and clear password fields on close. Focus restoration: a dialog opened from the desktop header returns focus to that same desktop button on close; a dialog opened from the mobile menu closes the menu and returns focus to the hamburger button on close, since the mobile menu's own Log in/Register buttons are hidden once the menu closes. Both dialogs are explicitly `position: fixed`, centered in the viewport via `inset: 50% auto auto 50%; margin: 0; transform: translate(-50%, -50%)` (needed because the project's global `* { margin: 0; }` reset overrides the browser's native dialog centering) — this is static layout positioning, not an animation. Visual treatment: `--gr-surface` background, plain `rgba(0,0,0,.6)` backdrop (no blur), no gradient/glow/shadow, `width: min(560px, calc(100vw - 48px))`, `max-height: 90svh` with internal scroll, 8px radius, 1px `--gr-glass-line` border, IBM Plex Sans. Under `prefers-reduced-motion: reduce`, no open/close animation.
+
+**Footer** — `<footer class="site-footer">`, placed after Screen 10, `--gr-void` background, 1px top hairline (`--gr-glass-line`), compact vertical padding `clamp(72px, 8vw, 96px)`, no gradient/shadow/glass.
+
+Full logo: `media/logo/gr-full-lockup.png`, alt text `GLOBAL RESERVE® — SECURE TODAY. EMPOWER TOMORROW.`, desktop width 380-420px, mobile `min(100%, 320px)`, never upscaled beyond 420px, tagline preserved uncropped.
+
+Social placeholders: four hand-authored inline SVGs (Instagram, LinkedIn, X, YouTube), `currentColor`, each `href="#"`, class `placeholder-link`, accessible `aria-label`, destinations TODO.
+
+Footer navigation (`<nav aria-label="Footer navigation">`):
+
+| Label | Destination |
+|---|---|
+| Overview | `#screen-2` |
+| RED | `#screen-3` |
+| Rewards | `#screen-4` |
+| Reserve | `#screen-5-5` |
+| Gia | `#screen-7` |
+| Terms | `#` (placeholder, TODO destination) |
+| Privacy | `#` (placeholder, TODO destination) |
+
+Legal line (IBM Plex Mono): `Global Reserve is part of the Glonari platform. This page is for product information only and is not a statement of account.`
+
+Copyright line (IBM Plex Mono): `© 2026 Global Reserve`
+
+Placeholder-link prevention (Terms, Privacy Policy, Terms, Privacy, Instagram, LinkedIn, X, YouTube — all class `placeholder-link`) is handled once in `js/site-shell.js`, which does not read from or modify `js/scrub.js` or any other screen-specific script.
+
 ---
 
 ## 6. MEDIA CONTRACT
@@ -561,7 +619,9 @@ Exception: inside the independent Screen 5.5 reserve hologram only, the illustra
 
 ## APPENDIX C — OUT OF SCOPE
 
-Do not add: navigation bar, footer with links, cookie banner, language switcher, dark-mode toggle, contact form, pricing table, FAQ accordion, testimonials, logo carousel, chat widget, analytics, or any third-party script.
+Do not add: cookie banner, language switcher, dark-mode toggle, contact form, pricing table, FAQ accordion, testimonials, logo carousel, chat widget, analytics, or any third-party script.
+
+**Approved exception (global site-shell task):** a global fixed header with navigation, a global footer with navigation and social placeholders, a registration dialog, and a login dialog are approved and specified in Section 5.11. Every other exclusion above remains in force — no cookie banner, language switcher, dark-mode toggle, contact form, pricing table, FAQ, testimonials, logo carousel, chat widget, analytics, third-party icon library, or other new script/dependency.
 
 ---
 

@@ -405,3 +405,20 @@ Then specify exactly one screen or one bounded system task.
 ## 14. Screen 5.5 exception
 
 > Screen 5.5 exception: the internal hologram interface uses the supplied Figma-derived panel implementation as its visual source of truth, including Roboto 400/500/600, its original type scale, colors, geometry, decorative SVG assets, and internal spacing. This exception applies only inside the Screen 5.5 hologram panel. The surrounding site and all other screens continue to use the standard Global Reserve design system.
+
+## 15. Global site-shell components
+
+Permanent visual rules for the fixed header, mobile menu, dialogs, and footer added by the global site-shell task. Implemented in `css/site-shell.css`.
+
+- **Fixed header**: `position: fixed`, solid `--gr-void` (or `--gr-surface`) background, 1px bottom hairline in `--gr-glass-line`, no gradient, no backdrop blur, no shadow. Height 72px desktop, 64px mobile. It is an overlay — Screen 1 keeps its existing geometry unchanged.
+- **Header wordmark exception**: the header brand lockup uses Playfair Display 700, color `var(--gr-bronze)`, for the live text `GLOBAL RESERVE®` — the only approved use of Playfair Display outside Screen 1. All other header, menu, dialog, and footer text uses IBM Plex Sans; small legal/copyright lines use IBM Plex Mono.
+- **Responsive breakpoint**: 1100px is the site-shell breakpoint. Above it, the full desktop header (nav + actions) is shown. At 1100px and below, nav and actions collapse into a hamburger-triggered mobile menu.
+- **Mobile menu**: solid dark surface (`--gr-void`), no gradient, appears below the fixed header, no open/close animation at any time (kept restrained by default, and required to be static under reduced motion).
+- **Bronze primary action**: the `Register` button and dialog submit buttons use a solid `--gr-bronze` fill with dark, readable text — bronze stays a small, restrained fill on interactive controls only, consistent with Section 8.1's rule that bronze is an accent and never a large background elsewhere on the page.
+- **`--gr-glass-line` dividers**: used for the header's bottom hairline, the footer's top hairline, dialog borders, and the `Log in` button's border — the same hairline token used elsewhere in the system for low-contrast separation.
+- **Native dialog appearance**: both the registration and login dialogs use the native `<dialog>` element with a solid `--gr-surface` background, 1px `--gr-glass-line` border, 8px radius, and a plain `rgba(0,0,0,.6)` backdrop — no blur, no gradient, no glass effect, no shadow. Both dialogs are explicitly centered in the viewport (`position: fixed; inset: 50% auto auto 50%; transform: translate(-50%, -50%)`) rather than relying on native implicit centering, since the project's global margin reset overrides it.
+- **Footer full-lockup image**: `media/logo/gr-full-lockup.png` is displayed at 380-420px wide on desktop and `min(100%, 320px)` on mobile, height auto, `object-fit: contain`, never upscaled beyond 420px, tagline never cropped.
+- **Solid dark surfaces**: header, mobile menu, dialogs, and footer all use flat `--gr-void`/`--gr-surface` fills — no gradients or glassmorphism anywhere in the site shell, matching Section 2's "avoid" list.
+- **Reduced-motion behaviour**: under `prefers-reduced-motion: reduce`, the mobile menu has no animation, dialogs open and close without animation, and no hover transform is applied anywhere in the site shell.
+
+Do not change existing Screen 1-10 design rules as part of this section.
