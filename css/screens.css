@@ -1189,3 +1189,198 @@
     transform: none;
   }
 }
+
+/* ── Screen 8 — Transparency ──
+   Compact dark section: centered header, then a full-viewport-width
+   marquee that breaks out of the container by living directly inside
+   #screen-8 (which carries no side padding of its own — only the
+   .container child does) rather than via a negative-margin/100vw hack.
+   Uses --gr-surface instead of the --gr-void used by Screens 2-7, per
+   the current task's instruction, so the section reads as a distinct
+   surface from Screen 7 without adding a border. */
+
+#screen-8 {
+  position: relative;
+  min-height: 60svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--gr-surface);
+  color: var(--gr-text-primary);
+  padding-block: clamp(72px, 8vw, 96px);
+}
+
+#screen-8 .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.screen-transparency__header {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(.22, .61, .36, 1),
+              transform 0.6s cubic-bezier(.22, .61, .36, 1);
+}
+
+.screen-transparency__header.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.screen-transparency__heading {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+}
+
+.screen-transparency__body {
+  margin-top: 24px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+}
+
+/* Full-bleed marquee. Two identical <ul> groups (the second
+   aria-hidden) sit directly adjacent inside the track, with zero gap
+   between them at the track level — every distance between pills lives
+   inside .ticker__list instead. Each group carries the six real items
+   plus one aria-hidden, visual-only repeat of the same six
+   (.ticker__item--repeat) so its own content is reliably wider than
+   the viewport at ordinary sizes; the group is also forced to at least
+   100vw and non-shrinking, so a group can never be narrower than the
+   screen. justify-content: space-around then spreads that group's own
+   pills across whatever little extra width remains at very wide
+   viewports instead of leaving it as one dead stretch of blank space
+   before the next group starts, while still landing a normal-looking
+   gap between the last pill of one group and the first pill of the
+   next (space-around gives every pill equal space on both sides, so
+   the two adjacent half-spaces at the group boundary sum to one
+   ordinary in-list gap). Because both groups are identical in content
+   and get sized/spaced identically, their computed widths match
+   exactly, so translating the track by exactly -50% reproduces the
+   first group's layout pixel-for-pixel and the loop has no visible
+   seam. */
+
+.ticker {
+  --ticker-fade: clamp(32px, 8vw, 120px);
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 80px;
+  mask-image: linear-gradient(to right, transparent 0, black var(--ticker-fade), black calc(100% - var(--ticker-fade)), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black var(--ticker-fade), black calc(100% - var(--ticker-fade)), transparent 100%);
+}
+
+.ticker__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: gr-ticker-scroll 48s linear infinite;
+  will-change: transform;
+}
+
+.ticker__list {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 12px;
+  /* Guarantees the seam to the next group always matches an ordinary
+     item gap. Twelve pills' own content is now reliably wider than
+     100vw, so space-around alone has no leftover space left to turn
+     into edge spacing at the group boundary — without this fixed
+     trailing pad the last pill of one group would sit flush against
+     the first pill of the next. */
+  padding-right: 12px;
+  width: max-content;
+  min-width: 100vw;
+  flex: 0 0 auto;
+  list-style: none;
+}
+
+.ticker__item {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 8px 18px;
+  border: 1px solid var(--gr-bronze-subtle);
+  border-radius: 999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: var(--fs-caption);
+  color: var(--gr-text-secondary);
+}
+
+@keyframes gr-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  #screen-8 .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .ticker {
+    margin-top: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-transparency__header {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ticker {
+    mask-image: none;
+    -webkit-mask-image: none;
+    padding-inline: 48px;
+  }
+
+  .ticker__track {
+    animation: none;
+    transform: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 12px;
+  }
+
+  .ticker__list {
+    width: auto;
+    min-width: 0;
+    padding-right: 0;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 12px;
+  }
+
+  .ticker__list[aria-hidden="true"] {
+    display: none;
+  }
+
+  .ticker__item--repeat {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 768px) {
+  .ticker {
+    padding-inline: 24px;
+  }
+}

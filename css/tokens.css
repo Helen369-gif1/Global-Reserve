@@ -40,6 +40,7 @@
   --gr-surface: #12141a;
   --gr-bronze: #cd7f32;
   --gr-bronze-glow: rgba(205, 127, 50, 0.4);
+  --gr-bronze-subtle: rgba(205, 127, 50, 0.15);
   --gr-text-primary: #ffffff;
   --gr-text-secondary: rgba(255, 255, 255, 0.7);
   --gr-text-tertiary: rgba(255, 255, 255, 0.45);

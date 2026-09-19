@@ -426,8 +426,46 @@
   </section>
 
   <!-- Screen 8 — Transparency -->
-  <section id="screen-8" data-screen="transparency" hidden>
-    <h2>Nothing happens quietly.</h2>
+  <section id="screen-8" data-screen="transparency">
+    <div class="container">
+      <div class="screen-transparency__header">
+        <h2 class="screen-transparency__heading">Nothing happens quietly.</h2>
+        <p class="screen-transparency__body">Every movement in your reserve is written down the moment it happens, with the date and the reason attached. Not a statement that arrives at the end of the month — a history you can open right now, at two in the morning, for no reason at all.</p>
+      </div>
+    </div>
+
+    <div class="ticker">
+      <div class="ticker__track">
+        <ul class="ticker__list">
+          <li class="ticker__item">Housing fee covered</li>
+          <li class="ticker__item">Rewards earned</li>
+          <li class="ticker__item">Position committed</li>
+          <li class="ticker__item">Qualification started</li>
+          <li class="ticker__item">Qualification complete</li>
+          <li class="ticker__item">Home reserved</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Housing fee covered</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Rewards earned</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Position committed</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Qualification started</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Qualification complete</li>
+          <li class="ticker__item ticker__item--repeat" aria-hidden="true">Home reserved</li>
+        </ul>
+        <ul class="ticker__list" aria-hidden="true">
+          <li class="ticker__item">Housing fee covered</li>
+          <li class="ticker__item">Rewards earned</li>
+          <li class="ticker__item">Position committed</li>
+          <li class="ticker__item">Qualification started</li>
+          <li class="ticker__item">Qualification complete</li>
+          <li class="ticker__item">Home reserved</li>
+          <li class="ticker__item ticker__item--repeat">Housing fee covered</li>
+          <li class="ticker__item ticker__item--repeat">Rewards earned</li>
+          <li class="ticker__item ticker__item--repeat">Position committed</li>
+          <li class="ticker__item ticker__item--repeat">Qualification started</li>
+          <li class="ticker__item ticker__item--repeat">Qualification complete</li>
+          <li class="ticker__item ticker__item--repeat">Home reserved</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
   <!-- Screen 9 — The honest part -->
@@ -447,5 +485,6 @@
   <script src="js/counter.js"></script>
   <script src="js/reserve-hologram.js"></script>
   <script src="js/gia.js"></script>
+  <script src="js/ticker.js"></script>
 </body>
 </html>
