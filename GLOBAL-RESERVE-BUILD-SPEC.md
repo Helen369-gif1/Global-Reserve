@@ -66,8 +66,9 @@ Rules for the existing code:
 /js/counter.js            Screen 4 counter animation (see Section 7)
 /js/timescale.js          Screen 2 balance-to-time animation (see Section 7)
 /js/reserve-hologram.js   Screen 5.5 scroll-driven vault projection (see Section 5.5a)
+/js/gia.js                Screen 7 scroll-driven quote message reveal plus play-once-per-visit video playback. Serves only Screen 7 — does not import from or depend on js/scrub.js, does not touch Screen 1. video.currentTime is never tied to scroll progress; currentTime = 0 is used only to reset the video after the visitor fully leaves Screen 7 (see Section 5.7)
 /media/                   All video and image assets
-/media/reveal-vault.mp4   Screen 4.5 background video, remuxed (stream copy, no re-encode) from the supplied clip (see Section 5.4a)
+/media/reveal-vault.mp4   Screen 4.5 background video, supplied directly as the final asset for this slot (see Section 5.4a)
 /media/reserve-hologram-bg.webp  Screen 5.5 clean vault background, without interface or text
 ```
 
@@ -214,14 +215,14 @@ The counter strip shows motion only. No currency, no digits that read as a real 
 
 A new, independent full-height section inserted between Screen 4 and Screen 5 — not a modification of either. One cinematic beat, no mechanics: an aerial night shot of a home slowly reveals to full-bleed as the visitor scrolls, one line of copy fades in over it, then it recedes into Screen 5. No eyebrow, no body copy, no buttons, no numbers.
 
-**Source footage.** The supplied aerial night clip (coastal homes, pools, warm lit windows, 1280×720, 6s, 30fps) is the reference mood and motion — very little camera movement, so it reads well as a calm, continuous loop rather than a busy pan.
+**Source footage.** `media/reveal-vault.mp4` is an aerial night shot of a home (coastal homes, pools, warm lit windows) — 1280×720, 30fps, 4.5s (135 frames), approximately 1.83MB. It was supplied directly by the designer as the final asset for this slot; very little camera movement, so it reads well as a calm, continuous loop rather than a busy pan.
 
 **Implementation — a real looping video, not a scroll-scrub.** Unlike Screen 1's hero, this video's `currentTime` is never touched by scroll: it plays as an ordinary `<video autoplay muted loop playsinline>`, running continuously on its own timeline the moment it's in view. Scroll drives only the presentation around it — the clip-path mask, the overlay, and the headline — through the section's own lightweight scroll-progress tracker in `/js/video-reveal.js`. This section does **not** call `bindScrollToVideo` (Section 2), which stays a Screen 1–only concern; the two screens' video needs are different (one is scrubbed frame-by-frame, one just plays), so they don't share that function. An `IntersectionObserver` on the section pauses the video once it's fully out of view and resumes it on return, so it never plays unnecessarily off-screen.
 
 **Behaviour:**
 
 - Section height: `320vh` scroll runway. Inner content is `position: sticky; top: 0; height: 100vh`, pinned for the full runway. This is the **second** pinned section on the page — Section 8's "no pinned sections other than Screen 1" rule is amended below to name both.
-- Video element: `media/reveal-vault.mp4`, `autoplay`, `muted`, `loop`, `playsinline`, `preload="auto"`, `object-fit: cover`. Remuxed from the supplied clip with a stream copy (`-c:v copy`, no re-encode) to keep the original quality exactly, since there's no seek-accuracy trade-off to make.
+- Video element: `media/reveal-vault.mp4`, `autoplay`, `muted`, `loop`, `playsinline`, `preload="auto"`, `object-fit: cover`.
 - Reveal: the frame starts as a small rounded window, `clip-path: inset(43% 36% 43% 36% round 16px)`, and expands to full-bleed, `inset(0% 0% 0% 0% round 0px)`, over the first 45% of the section's scroll distance (`0%–45%`). `scrub`, not a fixed duration — the expansion is tied one-to-one to scroll position, `ease: none`.
 - Fully open, full-bleed hold: `45%–70%`.
 - Closing: `70%–100%`, contracting to a wide panoramic band — never fully closing and never staying near full-screen — `clip-path: inset(30% 20% 30% 20% round 20px)` (roughly 60% of the frame's width, 40% of its height). Fully reversible on scroll-back, same as the reveal.
@@ -351,7 +352,17 @@ The note line stays at full body size and full contrast. Do not shrink it, grey 
 Two columns, 40/60: video left, text right. This video is required; it is the only human presence on the page. Do not substitute an illustration, an avatar, or an animation.
 Media slot: `--media-gia`.
 
-Over the video, in its lower third, two quote bubbles fade in one after another, 3s each, looping. Bubbles: 1px border `--gr-line`, `border-radius: 14px`, padding `10px 16px`, `--fs-small`, background `rgba(255,255,255,.9)`.
+Over the video, in its lower third, two quote messages appear in sequence, tied to scroll position rather than a timer:
+
+- The section provides extra scroll height (about `220svh`) around an inner stage that stays `position: sticky` while the sequence plays, on desktop viewports wide and tall enough for the full 40/60 composition to fit (implemented as `min-width: 1100px` and `min-height: 700px`). Below that threshold, on tablet, phone, or with `prefers-reduced-motion: reduce`, the extra scroll height and the sticky pin are both removed and the section flows normally.
+- At the start of the scroll-driven sequence both messages are hidden. Message 1 fades in first, roughly across local scroll progress `0.22–0.40`. Message 2 fades in later, roughly across `0.52–0.70`. These ranges are approximate and may be tuned in the browser.
+- Once a message has appeared it does not disappear again on further forward scroll — by the end of the scene both messages are visible together.
+- Scrolling back up reverses the sequence smoothly, since each message's opacity and position are a direct, continuous function of scroll progress rather than a state machine.
+- Each message animates `opacity: 0 → 1`, `translateX: -20px → 0`, `scale: 0.95 → 1`.
+- The video's `currentTime` is never tied to scroll progress; scroll drives only the two messages. (`currentTime` is set to `0` only once, as part of resetting the video after the visitor fully leaves Screen 7 — see the playback behaviour below.)
+- On tablet, phone, short viewports, and under reduced motion, both messages are shown immediately as a static, fully readable composition — no pin, no added scroll height.
+
+Bubbles: 1px border `--gr-glass-line`, `border-radius: 8px`, padding `10px 16px`, 15px body text, background `rgba(5,5,8,.72)` so they stay legible over any part of the video.
 
 Right column: eyebrow, H2, body, then five items in a two-column grid with the fifth spanning both columns, then a closing line above a 1px top hairline.
 
@@ -374,7 +385,16 @@ Right column: eyebrow, H2, body, then five items in a two-column grid with the f
 | Item 5 text | `First foundation. First qualification. First home secured. Years of work shouldn't end up as a line in a transaction list.` |
 | Closing line | `Gia never moves anything without your permission. She just makes sure you never have to guess.` |
 
-Video element: `autoplay muted loop playsinline preload="metadata"`, `poster` attribute pointing at the poster frame, `object-fit: cover`, `aspect-ratio: 4/5`, `border-radius: 8px`. Add a small mute/unmute toggle in the top-right corner of the video and an English `<track kind="captions" srclang="en" label="English" default>` if a VTT file is present in `/media/`.
+Video element: `muted playsinline preload="metadata"` (no `autoplay`, no `loop`), `poster` attribute pointing at the poster frame, `object-fit: cover`, `aspect-ratio: 4/5`, `border-radius: 8px`. The video is always muted and decorative: no mute/unmute toggle, no visible or custom controls, and no captions track. This is a silent presentational video, not a spoken message the visitor needs to hear.
+
+Playback is visibility-driven, not autoplay-on-load, and is handled locally in `js/gia.js` via `IntersectionObserver` (not scroll position, and never `video.currentTime` driven by scroll):
+
+- On page load the poster image shows; the video does not play.
+- The video starts, once, when roughly 30% of it becomes visible.
+- It plays through exactly once per visit to the section — no loop, and it does not restart while the visitor remains within Screen 7, including on a small wobble back and forth across the 30% line.
+- After it finishes, it holds on its last frame.
+- The visit state resets only once the visitor has fully left Screen 7 (the video is paused and `currentTime` is set back to `0`).
+- Returning to Screen 7 later starts the video again from the beginning once it crosses 30% visibility.
 
 ### 5.8 Screen 8 — Transparency
 
@@ -431,13 +451,13 @@ Every media slot is a `<div class="media-slot" data-slot="...">` with a fixed `a
 | Slot | Screen | File | Format | Length | Behaviour |
 |---|---|---|---|---|---|
 | `--media-hero` | 1 | `media/hero-vault.mp4` | 1280x720 | 6s | Scroll-scrubbed. Already present as `video111.mp4`; re-encode with `ffmpeg -i video111.mp4 -g 1 -an media/hero-vault.mp4` |
-| `--media-reveal` | 4.5 | `media/reveal-vault.mp4` | 1280x720, 30fps | 6s, autoplaying loop | Plays continuously (`autoplay muted loop`), independent of scroll — scroll drives only the section's mask, overlay, and headline (Section 5.4a). Remuxed from the supplied aerial night clip via stream copy, no re-encode |
+| `--media-reveal` | 4.5 | `media/reveal-vault.mp4` | 1280x720, 30fps | 4.5s (135 frames), ~1.83MB, autoplaying loop | Plays continuously (`autoplay muted loop`), independent of scroll — scroll drives only the section's mask, overlay, and headline (Section 5.4a) |
 | `--media-question` | 2 | `media/time-scale.mp4` | 1080x1080 | 4-6s | Plays once when the section reaches 40% of the viewport, then holds the last frame. May be generated instead — Section 7.1 |
 | `--media-red` | 3 | `media/red-object.webp` | 800x800, transparent | still | Static. Optional 8-10s loop if a video version is supplied |
 | `--media-counter` | 4 | `media/rewards-ticker.mp4` | 1920x200 | 8s | Loop. May be generated instead — Section 7.2 |
 | `--media-reserve-demo` | 5.5 | `media/reserve-hologram-bg.webp` | 1920x1080 | still | Clean vault background only; hologram interface is built in HTML/CSS/SVG and controlled by scroll |
 | `--media-home` | 6 | `media/home.png` | 1254x1254 source, cropped to 4:5 | still | Static photograph, displayed in a 4:5 cropped media frame |
-| `--media-gia` | 7 | `media/gia.mp4` | 1080x1350, 4:5 | 12-18s | Loop, muted, `playsinline`, poster `media/gia-poster.jpg` |
+| `--media-gia` | 7 | `media/gia.mp4` | 1288x1610, 4:5 | ~5.04s | No `autoplay`, no loop. Muted, `playsinline`, poster `media/gia-poster.jpg`. Plays once per visit when ~30% visible (`IntersectionObserver`), holds last frame, resets only after fully leaving Screen 7. No mute/unmute button, no controls, no captions track |
 | `--media-cta` | 10 | `media/cta-vault.mp4` | 1280x720 | 8-10s | Loop, muted, slowed |
 
 All videos: no audio track except Gia, `preload="metadata"`, `playsinline`, and `muted` before `autoplay`. Total page weight target under 12MB on desktop; on viewports under 768px, load poster images instead of the decorative videos on Screens 2, 4, and 10.
@@ -476,7 +496,7 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 ## 8. MOTION, ACCESSIBILITY, PERFORMANCE
 
 1. Scroll reveal for ordinary Screens 2-10: opacity `0 -> 1` and `translateY(24px -> 0)`, 600ms, `cubic-bezier(.22,.61,.36,1)`, triggered once at 25% visibility via `IntersectionObserver`. Screen 4.5 and Screen 5.5 use only their own explicitly specified scroll sequences.
-2. No parallax, no pinned sections other than Screen 1, Screen 4.5, and Screen 5.5, no horizontal scroll, no scroll hijacking.
+2. No parallax, no pinned sections other than Screen 1, Screen 4.5, Screen 5.5, and Screen 7, no horizontal scroll, no scroll hijacking. Screen 7's pin is conditional: it only applies at `min-width: 1100px` and `min-height: 700px` and `prefers-reduced-motion: no-preference` (Section 5.7); outside that window it is a normal static block.
 3. `@media (prefers-reduced-motion: reduce)`: disable reveal, marquee, bubbles, and generated animations; show final frames; Screen 1 shows a single static frame with its text visible. Screen 4.5 is fully static too: no pin, its clip-path/overlay/headline hold at their resting state without animating, and its background video has `autoplay`/`loop` turned off via JavaScript and is paused on a single stable frame. Screen 5.5 also loses its pin and displays the complete hologram composition statically with every label and the example disclaimer visible.
 4. Semantic markup: one `<h1>` (Screen 1) and `<h2>` for every other screen. Buttons that navigate are `<a>`. Decorative media gets `aria-hidden="true"` and empty `alt`.
 5. Keyboard: visible focus ring, logical tab order, no positive `tabindex`.
@@ -500,8 +520,8 @@ Before reporting done, verify each item and state the result:
 - [ ] Screen 5.5 appears automatically during normal page scroll, uses one unified projection plane, reveals Ready, Reserved, Scheduled, and Committed in the specified order, holds the complete readable composition, and reverses correctly on upward scroll. It is not a modal and is not gated behind a click.
 - [ ] Screen 5.5 shows `Example interface — not your account.` whenever example figures are visible; its interface text is HTML/SVG rather than baked into the background image.
 - [ ] In normal motion, Screen 4.5's video autoplays, loops, and is paused only while the section is fully out of view (`IntersectionObserver`); scroll drives only the clip-path reveal/contraction (no layout shift), overlay, and headline. Under `prefers-reduced-motion`, the mask/overlay/headline hold at rest and the video itself is paused on a single stable frame (`autoplay`/`loop` off via JavaScript) — a fully static composition.
-- [ ] Screen 1, Screen 4.5, and Screen 5.5 are the only three pinned sections on the page.
-- [ ] The Gia video element exists with `muted`, `loop`, `playsinline`, and a poster.
+- [ ] Screen 1, Screen 4.5, Screen 5.5, and Screen 7 are the only four pinned/scroll-stage sections on the page. Screen 7's pin applies only at `min-width: 1100px`, `min-height: 700px`, and `prefers-reduced-motion: no-preference` — outside that window it is a normal static block.
+- [ ] The Gia video element exists with `muted`, `playsinline`, and a poster, with no `autoplay` and no `loop`. It starts once at roughly 30% visibility, plays through exactly once per visit to the section, resets only after the visitor has fully left Screen 7, and plays again from the start on return.
 - [ ] Layout is correct at 1920, 1440, 1024, 768, and 375 CSS pixels.
 - [ ] `prefers-reduced-motion` produces a fully static, readable page.
 - [ ] No framework, no build step, no package manager files added.

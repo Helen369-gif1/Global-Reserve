@@ -376,8 +376,53 @@
   </section>
 
   <!-- Screen 7 — Gia -->
-  <section id="screen-7" data-screen="gia" hidden>
-    <h2>Gia isn't a chat window. She's the reason this feels simple.</h2>
+  <section id="screen-7" data-screen="gia" class="screen-gia">
+    <div class="screen-gia__wrapper">
+      <div class="screen-gia__sticky">
+        <div class="container screen-gia__container">
+
+          <div class="screen-gia__media">
+            <video class="screen-gia__video" src="media/gia.mp4" poster="media/gia-poster.jpg" muted playsinline preload="metadata" aria-hidden="true"></video>
+            <div class="screen-gia__messages">
+              <p class="screen-gia__message" data-gia-message="1">"Your housing is covered into the mid-2030s."</p>
+              <p class="screen-gia__message" data-gia-message="2">"Nothing needs your attention today."</p>
+            </div>
+          </div>
+
+          <div class="screen-gia__text">
+            <p class="screen-gia__eyebrow">THE PART THAT THINKS</p>
+            <h2 class="screen-gia__heading">Gia isn't a chat window. She's the reason this feels simple.</h2>
+            <p class="screen-gia__body">Gia is the intelligence running underneath Global Reserve. She's mostly invisible, and that's the point — you should be living your life, not administering it.</p>
+
+            <div class="screen-gia__items">
+              <div class="screen-gia__item">
+                <p class="screen-gia__item-title">She explains.</p>
+                <p class="screen-gia__item-text">Every change gets one sentence in plain language. Not a log entry, an answer: "At your current position, your housing is covered into the mid-2030s."</p>
+              </div>
+              <div class="screen-gia__item">
+                <p class="screen-gia__item-title">She watches.</p>
+                <p class="screen-gia__item-text">If your qualifying position starts drifting toward trouble, you hear it while it's still small.</p>
+              </div>
+              <div class="screen-gia__item">
+                <p class="screen-gia__item-title">She handles.</p>
+                <p class="screen-gia__item-text">Your monthly housing fee is taken care of in the background. No transfers, no reminders, no late anything.</p>
+              </div>
+              <div class="screen-gia__item">
+                <p class="screen-gia__item-title">She looks ahead.</p>
+                <p class="screen-gia__item-text">She keeps an eye on what your housing will need later and quietly keeps your position moving in that direction.</p>
+              </div>
+              <div class="screen-gia__item screen-gia__item--wide">
+                <p class="screen-gia__item-title">She marks the moments.</p>
+                <p class="screen-gia__item-text">First foundation. First qualification. First home secured. Years of work shouldn't end up as a line in a transaction list.</p>
+              </div>
+            </div>
+
+            <p class="screen-gia__closing">Gia never moves anything without your permission. She just makes sure you never have to guess.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Screen 8 — Transparency -->
@@ -401,5 +446,6 @@
   <script src="js/timescale.js"></script>
   <script src="js/counter.js"></script>
   <script src="js/reserve-hologram.js"></script>
+  <script src="js/gia.js"></script>
 </body>
 </html>

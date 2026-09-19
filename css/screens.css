@@ -983,3 +983,209 @@
     margin-left: 20px;
   }
 }
+
+/* ── Screen 7 — Gia ──
+   40/60 split (video left, text right), continuing the dark composition
+   from Screen 6. On a sufficiently large desktop viewport the section
+   becomes a scroll-driven scene: the inner stage pins while two quote
+   messages fade in over the lower third of the video, one after another,
+   driven by scroll progress (see js/gia.js). On tablet, phone, short
+   viewports, or with reduced motion, the pin is removed and both messages
+   are shown as a static, fully readable composition. */
+
+.screen-gia {
+  position: relative;
+  background: var(--gr-void);
+  color: var(--gr-text-primary);
+}
+
+.screen-gia__wrapper {
+  position: relative;
+}
+
+.screen-gia__sticky {
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
+  padding-block: clamp(96px, 11vw, 160px);
+}
+
+.screen-gia__sticky .container {
+  max-width: 1200px;
+  padding-left: 48px;
+  padding-right: 48px;
+  width: 100%;
+}
+
+.screen-gia__container {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  align-items: center;
+  gap: 96px;
+}
+
+.screen-gia__media {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.screen-gia__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.screen-gia__messages {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+}
+
+.screen-gia__message {
+  align-self: flex-start;
+  max-width: 88%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--gr-glass-line);
+  background: rgba(5, 5, 8, 0.72);
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--gr-text-primary);
+  opacity: 1;
+  transform: none;
+}
+
+.screen-gia__text {
+  min-width: 0;
+}
+
+.screen-gia__eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gr-bronze);
+}
+
+.screen-gia__heading {
+  margin-top: 16px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--gr-text-primary);
+}
+
+.screen-gia__body {
+  margin-top: 24px;
+  max-width: 560px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.7;
+  color: var(--gr-text-secondary);
+}
+
+.screen-gia__items {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 24px;
+}
+
+.screen-gia__item--wide {
+  grid-column: 1 / -1;
+}
+
+.screen-gia__item-title {
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--gr-text-primary);
+}
+
+.screen-gia__item-text {
+  margin-top: 8px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+}
+
+.screen-gia__closing {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gr-glass-line);
+  max-width: 720px;
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gr-text-secondary);
+}
+
+/* Scroll-driven scene: only on desktops wide and tall enough that the
+   whole 40/60 composition comfortably fits above the pinned stage, and
+   only without reduced motion — under prefers-reduced-motion: reduce the
+   wrapper keeps its normal height and the stage stays a static block, so
+   there is no extra scroll runway or pin to sit through. */
+@media (min-width: 1100px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .screen-gia__wrapper {
+    height: 220svh;
+  }
+
+  .screen-gia__sticky {
+    position: sticky;
+    top: 0;
+  }
+}
+
+@media (min-width: 1100px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .screen-gia__message {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+}
+
+@media (max-width: 1099px), (max-height: 699px) {
+  .screen-gia__container {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .screen-gia__sticky {
+    padding-block: clamp(72px, 9vw, 96px);
+  }
+
+  .screen-gia__sticky .container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .screen-gia__items {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-gia__message {
+    opacity: 1;
+    transform: none;
+  }
+}
