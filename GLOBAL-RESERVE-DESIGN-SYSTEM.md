@@ -251,7 +251,7 @@ Internal text rhythm:
 
 ### 7.2 Centered header plus content
 
-Use for Screens 3, 4, 5, 8, and 9 when appropriate.
+Use for Screens 3, 4, 5, and 8 when appropriate.
 
 - Header block max-width: 720px.
 - Center with `margin-inline: auto`.

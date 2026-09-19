@@ -17,7 +17,7 @@ This document is written in English. It ends with **Appendix D**, which is writt
 
 ## 1. WHAT WE ARE BUILDING
 
-A single-page marketing site for **GLOBAL RESERVE®**, a product inside the Glonari platform. Ten full-height screens, scrolled top to bottom, roughly one minute of reading — plus one short scroll-triggered video reveal inserted between Screens 4 and 5 (Section 5.4a).
+A single-page marketing site for **GLOBAL RESERVE®**, a product inside the Glonari platform. Nine full-height screens, scrolled top to bottom, roughly one minute of reading — plus one short scroll-triggered video reveal inserted between Screens 4 and 5 (Section 5.4a).
 
 It is a static site. No framework, no build step, no backend, no analytics, no cookie banner.
 
@@ -73,8 +73,8 @@ Rules for the existing code:
 ```
 
 - Vanilla HTML/CSS/JS. No npm, no bundler, no TypeScript, no Tailwind, no React.
-- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"`, plus `id="screen-4-5"` for the scroll-video reveal and `id="screen-5-5"` for the reserve hologram inserted between Screens 5 and 6.
-- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `reveal`, `states`, `reserve-demo`, `path`, `gia`, `transparency`, `honest`, `cta`.
+- One `<section>` per screen, with `id="screen-1"` through `id="screen-10"` — Screen 9 was removed by an approved design decision (see Section 5.9) and does not exist; Screen 8 is followed directly by Screen 10 — plus `id="screen-4-5"` for the scroll-video reveal and `id="screen-5-5"` for the reserve hologram inserted between Screens 5 and 6.
+- Each section gets a `data-screen` attribute with its slug: `hero`, `question`, `red`, `rewards`, `reveal`, `states`, `reserve-demo`, `path`, `gia`, `transparency`, `cta`.
 - Serve locally with `python3 -m http.server`. The blob fetch in the scrub script does not work over `file://`.
 
 ---
@@ -92,8 +92,8 @@ Put these in `/css/tokens.css` as custom properties on `:root`.
 | `--gr-paper` | `#F5F2ED` | Page background |
 | `--gr-paper-2` | `#EDE8E0` | Alternating section background |
 | `--gr-line` | `#D7D0C4` | Hairlines, dividers |
-| `--gr-dark` | `#17140F` | Screen 9 background |
-| `--gr-dark-ink` | `#F1EBE1` | Screen 9 text |
+| `--gr-dark` | `#17140F` | Unused — reserved from removed Screen 9 |
+| `--gr-dark-ink` | `#F1EBE1` | Unused — reserved from removed Screen 9 |
 | `--gr-accent` | `#B98A3C` | Warm gold. Hairline accents and focus rings only — never large fills |
 | `--gr-on-media` | `#FFFFFF` | Text placed over video |
 
@@ -413,20 +413,9 @@ Each item is a pill: 1px border `--gr-line`, `border-radius: 999px`, padding `8p
 
 Marquee behaviour: one direction, constant speed, 40-60s per cycle, no pause on hover, no drag. Fade the left and right 120px with a mask so pills do not clip hard at the edges. Implement by duplicating the item list once and translating the track by -50%; `aria-hidden="true"` on the duplicate.
 
-### 5.9 Screen 9 — The honest part
+### 5.9 Screen 9 — Removed
 
-Inverted screen: background `--gr-dark`, text `--gr-dark-ink`. Everything centered in a 640px column, section padding 1.5x normal. Bullets are left-aligned inside the centered block. No media, no graphics.
-
-| Element | Copy | Align |
-|---|---|---|
-| H2 | `Here's what this isn't.` | center |
-| Body | `Global Reserve is built for one thing: managing your participation in Glonari's housing world. That focus is the whole advantage, and it comes with limits we'd rather say out loud than bury in a footnote.` | center |
-| Bullet 1 | `It's not a bank account, a deposit, or an investment product` | left |
-| Bullet 2 | `There's no yield, and no promise you can cash it out` | left |
-| Bullet 3 | `RED is a housing credit — it's used, not traded` | left |
-| Lead line | `Purpose-built beats general-purpose. That's the entire idea.` | center |
-
-Bullet marker is an em dash in `--gr-ink-2`, not a disc, not an icon. Body text stays at `--fs-body`. This screen must not read like fine print.
+Screen 9 ("The honest part") was intentionally removed from the page by an approved design decision. The page flow goes directly from Screen 8 to Screen 10. Do not recreate this screen, its copy, or any compact replacement, and do not move its content into Screen 8, Screen 10, a footer, or any other location.
 
 ### 5.10 Screen 10 — CTA
 
@@ -512,7 +501,7 @@ A horizontal strip suggesting continuous accrual: small marks drifting right at 
 Before reporting done, verify each item and state the result:
 
 - [ ] No Cyrillic character exists anywhere in the repository output. Verify with `grep -rPl "[\x{0400}-\x{04FF}]" --include=* .` over the files you created or edited, excluding the three original `.md` reference files.
-- [ ] All ten numbered screens plus Screen 4.5 and Screen 5.5 exist with correct ids and `data-screen` values (twelve sections total).
+- [ ] All nine numbered screens (1-8, 10 — Screen 9 intentionally removed) plus Screen 4.5 and Screen 5.5 exist with correct ids and `data-screen` values (eleven sections total).
 - [ ] Every string on the page matches Section 5 character for character.
 - [ ] Screen 1 still scrubs on scroll and its text coordinates are unchanged.
 - [ ] Missing media assets render the placeholder, and the page still lays out correctly.
@@ -540,7 +529,7 @@ Use these in order. Each assumes this document is open in the workspace as `BUIL
 
 > Read BUILD-SPEC.md Section 5.2 through 5.5a and build Screens 2 through 5 plus the independent Screen 4.5 and Screen 5.5 sections between them: markup, copy verbatim, layout, scroll behaviour, reduced-motion fallback, and responsive behaviour at the 768px breakpoint. Use the media placeholder from Section 6 for every media slot. Screen 5.5 is not a modal and must not be hidden behind a click. English only.
 
-> Now do the same for Sections 5.6 to 5.8, then 5.9 to 5.10.
+> Now do the same for Sections 5.6 to 5.8, then 5.10. Screen 9 was removed by an approved design decision (Section 5.9) — do not build it.
 
 **A3 — Motion and accessibility**
 
